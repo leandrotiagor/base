@@ -285,3 +285,45 @@ body {
 .btn-salvar-senha:hover {
     background: #117373;
 }
+
+/* =========================================
+   CLIMA (cabeçalho do painel)
+========================================= */
+
+.clima-info {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.clima-info #climaTemp {
+    font-weight: bold;
+    color: #168c8c;
+}
+
+/* =========================================
+   RELÓGIO FIXO (horário de Brasília)
+========================================= */
+
+.relogio-fixo {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    background: rgba(17, 24, 39, 0.88);
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    z-index: 500;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+.relogio-fixo #relogioHora {
+    font-size: 15px;
+    font-weight: bold;
+}

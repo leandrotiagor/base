@@ -158,6 +158,16 @@ if (modulo.nome === 'Anotações') {
     });
 }
 
+// Cadastro de Usuários (agora é um módulo, não mais botão fixo)
+if (modulo.nome === 'Cadastro de Usuários') {
+
+    card.style.cursor = 'pointer';
+
+    card.addEventListener('click', () => {
+        window.location.href = 'admin.html';
+    });
+}
+
 modulosContainer.appendChild(card);
 
         });
@@ -222,11 +232,6 @@ async function verificarAdministrador() {
 verificarAdministrador();
 
 // Botão de Administração - Redireciona para admin.html
-document.getElementById('btnAdministracao').addEventListener('click', () => {
-    window.location.href = 'admin.html';
-});
-
-// Botão de Auditoria - Redireciona para auditoria.html
 document.getElementById('btnAuditoria').addEventListener('click', () => {
     window.location.href = 'auditoria.html';
 });
@@ -313,3 +318,147 @@ formTrocarSenha.addEventListener('submit', async (event) => {
     }
 
 });
+
+
+// =====================================================
+// RELÓGIO - HORÁRIO DE BRASÍLIA
+// =====================================================
+
+function atualizarRelogio() {
+
+    const agora = new Date();
+
+    const dataFormatada = agora.toLocaleDateString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+
+    const horaFormatada = agora.toLocaleTimeString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    document.getElementById('relogioData').textContent = dataFormatada;
+
+    document.getElementById('relogioHora').textContent =
+        `${horaFormatada} (Brasília)`;
+}
+
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
+
+
+// =====================================================
+// CLIMA - LOCALIZAÇÃO DO NAVEGADOR
+// =====================================================
+
+const climaCidade = document.getElementById('climaCidade');
+const climaTemp = document.getElementById('climaTemp');
+
+function descreverClima(codigo) {
+
+    const mapa = {
+        0: 'Céu limpo',
+        1: 'Poucas nuvens',
+        2: 'Parcialmente nublado',
+        3: 'Nublado',
+        45: 'Neblina',
+        48: 'Neblina com geada',
+        51: 'Garoa fraca',
+        53: 'Garoa moderada',
+        55: 'Garoa forte',
+        61: 'Chuva fraca',
+        63: 'Chuva moderada',
+        65: 'Chuva forte',
+        71: 'Neve fraca',
+        73: 'Neve moderada',
+        75: 'Neve forte',
+        80: 'Pancadas de chuva',
+        81: 'Pancadas de chuva moderadas',
+        82: 'Pancadas de chuva fortes',
+        95: 'Tempestade',
+        96: 'Tempestade com granizo',
+        99: 'Tempestade forte com granizo'
+    };
+
+    return mapa[codigo] || 'Condição indisponível';
+}
+
+async function carregarClima() {
+
+    if (!navigator.geolocation) {
+        climaCidade.textContent = 'Localização não suportada neste navegador.';
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        async (posicao) => {
+
+            const { latitude, longitude } = posicao.coords;
+
+            try {
+
+                // Busca o clima atual (Open-Meteo, sem necessidade de chave)
+                const respostaClima = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=America%2FSao_Paulo`
+                );
+
+                const dadosClima = await respostaClima.json();
+
+                const temperatura = dadosClima?.current_weather?.temperature;
+                const codigoClima = dadosClima?.current_weather?.weathercode;
+
+                // Busca o nome da cidade a partir das coordenadas
+                let nomeCidade = 'Sua localização';
+
+                try {
+
+                    const respostaCidade = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+                    );
+
+                    const dadosCidade = await respostaCidade.json();
+
+                    nomeCidade =
+                        dadosCidade?.address?.city ||
+                        dadosCidade?.address?.town ||
+                        dadosCidade?.address?.municipality ||
+                        dadosCidade?.address?.village ||
+                        nomeCidade;
+
+                } catch (erroCidade) {
+                    console.error('Erro ao obter nome da cidade:', erroCidade);
+                }
+
+                climaCidade.textContent = `📍 ${nomeCidade}`;
+
+                climaTemp.textContent =
+                    temperatura !== undefined
+                        ? `${Math.round(temperatura)}°C · ${descreverClima(codigoClima)}`
+                        : 'Clima indisponível';
+
+            } catch (erro) {
+
+                console.error('Erro ao carregar clima:', erro);
+
+                climaCidade.textContent = 'Não foi possível obter o clima.';
+            }
+
+        },
+
+        (erro) => {
+
+            console.error('Erro de geolocalização:', erro);
+
+            climaCidade.textContent =
+                'Permissão de localização não concedida.';
+        }
+    );
+}
+
+carregarClima();

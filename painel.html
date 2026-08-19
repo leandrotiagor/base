@@ -78,6 +78,11 @@
                     Carregando...
                 </p>
 
+                <p id="climaInfo" class="clima-info">
+                    <span id="climaCidade">Obtendo localização...</span>
+                    <span id="climaTemp"></span>
+                </p>
+
             </div>
 
 
@@ -87,14 +92,6 @@
                     id="adminArea"
                     style="display: none;"
                 >
-
-                    <button
-                        id="btnAdministracao"
-                        class="btn-sair"
-                        type="button"
-                    >
-                        👤 Cadastro de Usuários
-                    </button>
 
                     <button
                         id="btnAuditoria"
@@ -236,6 +233,16 @@
 
         </div>
 
+    </div>
+
+
+    <!-- ==============================
+         DATA / HORA (Horário de Brasília)
+    =============================== -->
+
+    <div id="relogioFixo" class="relogio-fixo">
+        <div id="relogioData">--/--/----</div>
+        <div id="relogioHora">--:--:--</div>
     </div>
 
 
