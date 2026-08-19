@@ -180,6 +180,16 @@ body {
     background: #f5f5f5;
 }
 
+.btn-sair-vermelho {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+}
+
+.btn-sair-vermelho:hover {
+    background: #b91c1c;
+}
+
 /* =========================================
    MODAL (usado em Trocar Senha, etc.)
 ========================================= */

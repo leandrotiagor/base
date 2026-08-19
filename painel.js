@@ -168,6 +168,16 @@ if (modulo.nome === 'Cadastro de Usuários') {
     });
 }
 
+// Auditoria (agora é um módulo, não mais botão fixo)
+if (modulo.nome === 'Auditoria') {
+
+    card.style.cursor = 'pointer';
+
+    card.addEventListener('click', () => {
+        window.location.href = 'auditoria.html';
+    });
+}
+
 modulosContainer.appendChild(card);
 
         });
@@ -199,42 +209,6 @@ btnSair.addEventListener('click', async () => {
 
 // Inicia o painel
 carregarPainel();
-
-
-// Verifica se o usuário é administrador
-async function verificarAdministrador() {
-    const {
-        data: { user },
-        error
-    } = await supabaseClient.auth.getUser();
-
-    if (error || !user) {
-        return;
-    }
-
-    const { data: operador, error: operadorError } = await supabaseClient
-        .from('operadores')
-        .select('perfil, ativo')
-        .eq('id', user.id)
-        .single();
-
-    if (operadorError) {
-        console.error('Erro ao verificar operador:', operadorError);
-        return;
-    }
-
-    if (operador.ativo && operador.perfil === 'admin') {
-        document.getElementById('adminArea').style.display = 'block';
-    }
-}
-
-// Chama a função para exibir o botão caso seja admin
-verificarAdministrador();
-
-// Botão de Administração - Redireciona para admin.html
-document.getElementById('btnAuditoria').addEventListener('click', () => {
-    window.location.href = 'auditoria.html';
-});
 
 
 // =====================================================
