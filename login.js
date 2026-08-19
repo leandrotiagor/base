@@ -51,6 +51,8 @@ loginForm.addEventListener('submit', async function (event) {
         // 3. Login realizado
         console.log('Usuário autenticado:', data.user);
 
+        await registrarAuditoria('login', 'Login realizado no sistema.');
+
   window.location.href = 'painel.html';
 
     } catch (error) {

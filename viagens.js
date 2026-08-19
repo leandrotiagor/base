@@ -261,6 +261,10 @@ async function criarViagem(
         data
     );
 
+    await registrarAuditoria(
+        'acao',
+        `Criou a viagem "${nome}".`
+    );
 
     return data;
 }
@@ -362,6 +366,10 @@ async function atualizarViagem(
         data
     );
 
+    await registrarAuditoria(
+        'acao',
+        `Atualizou a viagem "${nome}".`
+    );
 
     return data;
 }
@@ -458,6 +466,10 @@ async function excluirViagem(
         viagemId
     );
 
+    await registrarAuditoria(
+        'acao',
+        `Excluiu a viagem (ID ${viagemId}).`
+    );
 
     return true;
 }
@@ -573,6 +585,10 @@ async function criarLancamento(
         data
     );
 
+    await registrarAuditoria(
+        'acao',
+        `Criou um lançamento (${registro.tipo}) no valor de R$ ${valor}.`
+    );
 
     return data;
 }
@@ -638,6 +654,10 @@ async function excluirLancamento(
         lancamentoId
     );
 
+    await registrarAuditoria(
+        'acao',
+        `Excluiu um lançamento (ID ${lancamentoId}).`
+    );
 
     return true;
 }
@@ -736,6 +756,10 @@ async function atualizarLancamento(
         data
     );
 
+    await registrarAuditoria(
+        'acao',
+        `Atualizou um lançamento (ID ${lancamentoId}).`
+    );
 
     return data;
 }

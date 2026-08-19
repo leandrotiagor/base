@@ -178,6 +178,8 @@ modulosContainer.appendChild(card);
 // Botão sair
 btnSair.addEventListener('click', async () => {
 
+    await registrarAuditoria('logout', 'Logout realizado no sistema.');
+
     await supabaseClient.auth.signOut();
 
     window.location.href = 'index.html';
@@ -222,4 +224,92 @@ verificarAdministrador();
 // Botão de Administração - Redireciona para admin.html
 document.getElementById('btnAdministracao').addEventListener('click', () => {
     window.location.href = 'admin.html';
+});
+
+// Botão de Auditoria - Redireciona para auditoria.html
+document.getElementById('btnAuditoria').addEventListener('click', () => {
+    window.location.href = 'auditoria.html';
+});
+
+
+// =====================================================
+// TROCAR SENHA
+// =====================================================
+
+const modalTrocarSenha = document.getElementById('modalTrocarSenha');
+const formTrocarSenha = document.getElementById('formTrocarSenha');
+const btnTrocarSenha = document.getElementById('btnTrocarSenha');
+const btnFecharTrocarSenha = document.getElementById('btnFecharTrocarSenha');
+const btnCancelarTrocarSenha = document.getElementById('btnCancelarTrocarSenha');
+
+
+function abrirModalTrocarSenha() {
+    formTrocarSenha.reset();
+    modalTrocarSenha.style.display = 'flex';
+}
+
+function fecharModalTrocarSenha() {
+    modalTrocarSenha.style.display = 'none';
+    formTrocarSenha.reset();
+}
+
+btnTrocarSenha.addEventListener('click', abrirModalTrocarSenha);
+btnFecharTrocarSenha.addEventListener('click', fecharModalTrocarSenha);
+btnCancelarTrocarSenha.addEventListener('click', fecharModalTrocarSenha);
+
+
+formTrocarSenha.addEventListener('submit', async (event) => {
+
+    event.preventDefault();
+
+    const novaSenha = document.getElementById('novaSenha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+    if (novaSenha.length < 6) {
+        alert('A senha deve possuir pelo menos 6 caracteres.');
+        return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+        alert('As senhas não coincidem.');
+        return;
+    }
+
+    const botao = formTrocarSenha.querySelector('button[type="submit"]');
+
+    botao.disabled = true;
+    botao.textContent = 'Salvando...';
+
+    try {
+
+        const { error } = await supabaseClient.auth.updateUser({
+            password: novaSenha
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        await registrarAuditoria('acao', 'Trocou a própria senha.');
+
+        alert('Senha alterada com sucesso!');
+
+        fecharModalTrocarSenha();
+
+    } catch (error) {
+
+        console.error('Erro ao trocar senha:', error);
+
+        alert(
+            'Não foi possível trocar a senha.\n\n' +
+            (error.message || 'Erro desconhecido.')
+        );
+
+    } finally {
+
+        botao.disabled = false;
+        botao.textContent = 'Salvar nova senha';
+
+    }
+
 });

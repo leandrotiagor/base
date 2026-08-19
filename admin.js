@@ -251,6 +251,55 @@ formOperador.addEventListener('submit', async (event) => {
             );
         }
 
+        // Aplica os módulos pré-definidos do perfil escolhido
+        // ao novo operador recém-criado.
+        try {
+
+            const {
+                data: novoOperador
+            } = await supabaseClient
+                .from('operadores')
+                .select('id')
+                .eq('cpf', cpf)
+                .single();
+
+            if (novoOperador) {
+
+                const {
+                    data: modulosPerfil
+                } = await supabaseClient
+                    .from('permissoes_perfil')
+                    .select('modulo_id')
+                    .eq('perfil', perfil);
+
+                if (modulosPerfil && modulosPerfil.length > 0) {
+
+                    const novasPermissoes = modulosPerfil.map(
+                        item => ({
+                            operador_id: novoOperador.id,
+                            modulo_id: item.modulo_id
+                        })
+                    );
+
+                    await supabaseClient
+                        .from('permissoes')
+                        .insert(novasPermissoes);
+                }
+            }
+
+        } catch (erroPermissoesPadrao) {
+
+            console.error(
+                'Erro ao aplicar permissões padrão do perfil:',
+                erroPermissoesPadrao
+            );
+        }
+
+        await registrarAuditoria(
+            'acao',
+            `Cadastrou o operador "${nome}" (perfil: ${perfil}).`
+        );
+
         alert('Operador cadastrado com sucesso!');
 
         fecharModalOperador();
@@ -277,10 +326,12 @@ formOperador.addEventListener('submit', async (event) => {
 
 
 let operadorPermissaoAtual = null;
+let nomeOperadorPermissaoAtual = null;
 
 async function abrirPermissoes(operadorId, nomeOperador) {
 
     operadorPermissaoAtual = operadorId;
+    nomeOperadorPermissaoAtual = nomeOperador;
 
     document.getElementById(
         'nomeOperadorPermissao'
@@ -450,6 +501,11 @@ async function salvarPermissoes() {
             }
         }
 
+        await registrarAuditoria(
+            'acao',
+            `Atualizou as permissões do operador "${nomeOperadorPermissaoAtual}".`
+        );
+
         alert(
             'Permissões salvas com sucesso!'
         );
@@ -468,6 +524,225 @@ async function salvarPermissoes() {
         );
     }
 }
+
+// =====================================================
+// PERMISSÕES POR PERFIL
+// =====================================================
+// Define quais módulos cada PERFIL (admin, gerente,
+// operador, caixa, n1...) recebe por padrão. Usado também
+// para habilitar automaticamente os módulos de um novo
+// operador de acordo com o perfil escolhido no cadastro.
+// =====================================================
+
+const PERFIS_DISPONIVEIS = [
+    { valor: 'operador', rotulo: 'Operador' },
+    { valor: 'gerente', rotulo: 'Gerente' },
+    { valor: 'caixa', rotulo: 'Caixa' },
+    { valor: 'n1', rotulo: 'N1' },
+    { valor: 'admin', rotulo: 'Administrador' }
+];
+
+let perfilPermissaoAtual = null;
+
+
+function abrirPermissoesPerfil() {
+
+    document.getElementById(
+        'modalPermissoesPerfil'
+    ).style.display = 'flex';
+
+    const seletor = document.getElementById('seletorPerfilPermissao');
+
+    seletor.innerHTML = PERFIS_DISPONIVEIS.map(
+        p => `<option value="${p.valor}">${p.rotulo}</option>`
+    ).join('');
+
+    perfilPermissaoAtual = seletor.value;
+
+    carregarModulosPorPerfil(perfilPermissaoAtual);
+}
+
+
+function fecharPermissoesPerfil() {
+
+    document.getElementById(
+        'modalPermissoesPerfil'
+    ).style.display = 'none';
+
+    perfilPermissaoAtual = null;
+}
+
+
+async function carregarModulosPorPerfil(perfil) {
+
+    perfilPermissaoAtual = perfil;
+
+    const lista = document.getElementById('listaPermissoesPerfil');
+
+    lista.innerHTML = 'Carregando módulos...';
+
+    try {
+
+        const {
+            data: modulos,
+            error: erroModulos
+        } = await supabaseClient
+            .from('modulos')
+            .select('*')
+            .eq('ativo', true)
+            .order('id');
+
+        if (erroModulos) {
+            throw erroModulos;
+        }
+
+        const {
+            data: permissoesPerfil,
+            error: erroPermissoesPerfil
+        } = await supabaseClient
+            .from('permissoes_perfil')
+            .select('modulo_id')
+            .eq('perfil', perfil);
+
+        if (erroPermissoesPerfil) {
+            throw erroPermissoesPerfil;
+        }
+
+        const permitidos = new Set(
+            (permissoesPerfil || []).map(p => p.modulo_id)
+        );
+
+        lista.innerHTML = '';
+
+        if (!modulos || modulos.length === 0) {
+            lista.innerHTML = '<p>Nenhum módulo cadastrado ainda.</p>';
+            return;
+        }
+
+        modulos.forEach(modulo => {
+
+            const marcado = permitidos.has(modulo.id);
+
+            const div = document.createElement('div');
+
+            div.className = 'permissao-item';
+
+            div.innerHTML = `
+                <label>
+                    <input
+                        type="checkbox"
+                        class="checkbox-modulo-perfil"
+                        data-modulo-id="${modulo.id}"
+                        ${marcado ? 'checked' : ''}>
+
+                    <span class="icone-modulo">
+                        ${modulo.icone || '📦'}
+                    </span>
+
+                    <span>
+                        <strong>${modulo.nome}</strong>
+
+                        ${
+                            modulo.descricao
+                                ? `<small>${modulo.descricao}</small>`
+                                : ''
+                        }
+                    </span>
+                </label>
+            `;
+
+            lista.appendChild(div);
+        });
+
+    } catch (erro) {
+
+        console.error(
+            'Erro ao carregar módulos do perfil:',
+            erro
+        );
+
+        lista.innerHTML =
+            '<p>Erro ao carregar módulos.</p>';
+    }
+}
+
+
+async function salvarPermissoesPerfil() {
+
+    if (!perfilPermissaoAtual) {
+        return;
+    }
+
+    try {
+
+        const checkboxes = document.querySelectorAll(
+            '.checkbox-modulo-perfil'
+        );
+
+        const selecionados = [];
+
+        checkboxes.forEach(checkbox => {
+
+            if (checkbox.checked) {
+
+                selecionados.push({
+                    perfil: perfilPermissaoAtual,
+                    modulo_id: Number(checkbox.dataset.moduloId)
+                });
+            }
+        });
+
+        const {
+            error: erroDelete
+        } = await supabaseClient
+            .from('permissoes_perfil')
+            .delete()
+            .eq('perfil', perfilPermissaoAtual);
+
+        if (erroDelete) {
+            throw erroDelete;
+        }
+
+        if (selecionados.length > 0) {
+
+            const {
+                error: erroInsert
+            } = await supabaseClient
+                .from('permissoes_perfil')
+                .insert(selecionados);
+
+            if (erroInsert) {
+                throw erroInsert;
+            }
+        }
+
+        await registrarAuditoria(
+            'acao',
+            `Atualizou os módulos padrão do perfil "${perfilPermissaoAtual}".`
+        );
+
+        alert('Permissões do perfil salvas com sucesso!');
+
+    } catch (erro) {
+
+        console.error(
+            'Erro ao salvar permissões do perfil:',
+            erro
+        );
+
+        alert('Não foi possível salvar as permissões do perfil.');
+    }
+}
+
+
+document.getElementById('btnPermissoesPerfil')
+    .addEventListener('click', abrirPermissoesPerfil);
+
+document.getElementById('seletorPerfilPermissao')
+    .addEventListener('change', (event) => {
+        carregarModulosPorPerfil(event.target.value);
+    });
+
 
 // Inicializa a página administrativa
 iniciarAdministracao();
@@ -670,6 +945,11 @@ async function salvarEdicaoOperador() {
         }
 
 
+        await registrarAuditoria(
+            'acao',
+            `Editou o operador "${nome}" (perfil: ${perfil}).`
+        );
+
         alert(
             'Operador atualizado com sucesso!'
         );
@@ -775,6 +1055,11 @@ async function resetarSenhaOperador(
                 resposta.erro
             );
         }
+
+        await registrarAuditoria(
+            'acao',
+            `Redefiniu a senha do operador "${nomeOperador}".`
+        );
 
         alert(
             `Senha de ${nomeOperador} redefinida com sucesso!\n\n` +

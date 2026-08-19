@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Auditoria - Leandro Sistemas</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-voltar {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-filtrar {
+            background: #111827;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+            align-items: end;
+        }
+
+        .filtros label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .filtros input,
+        .filtros select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .filtros input:focus,
+        .filtros select:focus {
+            outline: none;
+            border-color: #111827;
+        }
+
+        .tabela-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        th {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tag-login {
+            background: #e4efe6;
+            color: #2f6f4e;
+        }
+
+        .tag-logout {
+            background: #f4e5df;
+            color: #a8402a;
+        }
+
+        .tag-acao {
+            background: #e5eefc;
+            color: #1d4ed8;
+        }
+
+        .mensagem {
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 15px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 0 10px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>
+            📊 Auditoria
+        </h1>
+
+        <button
+            class="btn-voltar"
+            id="btnVoltar"
+            type="button"
+        >
+            ← Voltar
+        </button>
+
+    </header>
+
+
+    <div class="container">
+
+        <div class="card">
+
+            <div class="filtros">
+
+                <div>
+                    <label for="filtroOperador">Operador</label>
+                    <select id="filtroOperador">
+                        <option value="">Todos os operadores</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filtroTipo">Tipo</label>
+                    <select id="filtroTipo">
+                        <option value="">Todos</option>
+                        <option value="login">Login</option>
+                        <option value="logout">Logout</option>
+                        <option value="acao">Ação</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filtroDataInicio">De</label>
+                    <input type="date" id="filtroDataInicio">
+                </div>
+
+                <div>
+                    <label for="filtroDataFim">Até</label>
+                    <input type="date" id="filtroDataFim">
+                </div>
+
+                <div>
+                    <button
+                        class="btn-filtrar"
+                        id="btnFiltrar"
+                        type="button"
+                        style="width: 100%;"
+                    >
+                        🔍 Filtrar
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="tabela-wrap">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Data / Hora</th>
+                            <th>Operador</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="listaAuditoria">
+                        <tr>
+                            <td colspan="4" class="mensagem">
+                                Carregando registros...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="auditoria.js"></script>
+
+    <script>
+        document
+            .getElementById('btnVoltar')
+            .addEventListener('click', function () {
+                window.location.href = 'painel.html';
+            });
+    </script>
+
+</body>
+
+</html>

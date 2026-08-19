@@ -188,6 +188,8 @@ async function criarAnotacao() {
 
         textoAnotacao.value = '';
 
+        await registrarAuditoria('acao', 'Criou uma anotação.');
+
         await carregarAnotacoes();
 
     } finally {
@@ -219,6 +221,8 @@ async function excluirAnotacao(id) {
         alert('Não foi possível excluir a anotação.');
         return;
     }
+
+    await registrarAuditoria('acao', 'Excluiu uma anotação.');
 
     await carregarAnotacoes();
 }

@@ -309,13 +309,25 @@
                 👤 Operadores
             </h2>
 
-            <button
-                class="btn-novo"
-                id="btnNovoOperador"
-                type="button"
-            >
-                + Novo operador
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+
+                <button
+                    class="btn-voltar"
+                    id="btnPermissoesPerfil"
+                    type="button"
+                >
+                    🎚️ Permissões por Perfil
+                </button>
+
+                <button
+                    class="btn-novo"
+                    id="btnNovoOperador"
+                    type="button"
+                >
+                    + Novo operador
+                </button>
+
+            </div>
 
         </div>
 
@@ -563,6 +575,73 @@
                     onclick="salvarPermissoes()"
                 >
                     Salvar permissões
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         MODAL PERMISSÕES POR PERFIL
+    =============================== -->
+
+    <div
+        id="modalPermissoesPerfil"
+        class="modal"
+        style="display: none;"
+    >
+
+        <div class="modal-conteudo">
+
+            <div class="modal-cabecalho">
+
+                <h2>
+                    🎚️ Permissões por Perfil
+                </h2>
+
+                <button
+                    class="fechar-modal"
+                    type="button"
+                    onclick="fecharPermissoesPerfil()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <p>
+                Perfil:
+                <select id="seletorPerfilPermissao"></select>
+            </p>
+
+            <p style="color:#6b7280; font-size: 13px; margin-top: -8px;">
+                Módulos marcados aqui serão habilitados automaticamente
+                para qualquer novo operador cadastrado com este perfil.
+            </p>
+
+            <div id="listaPermissoesPerfil">
+                Carregando módulos...
+            </div>
+
+            <div class="modal-acoes">
+
+                <button
+                    class="btn-cancelar"
+                    type="button"
+                    onclick="fecharPermissoesPerfil()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="btn-salvar"
+                    type="button"
+                    onclick="salvarPermissoesPerfil()"
+                >
+                    Salvar permissões do perfil
                 </button>
 
             </div>
