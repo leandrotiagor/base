@@ -1,0 +1,4457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+
+<title>Controle de Viagens</title>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#20242b">
+
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent">
+
+<meta name="apple-mobile-web-app-title"
+      content="Viagens">
+
+<link rel="apple-touch-icon"
+      href="icon-192.png">
+
+<link rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="icon-512.png">
+
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root{
+
+  --paper:#f6f3ec;
+  --paper-line:#ded7c4;
+  --ink:#20242b;
+  --ink-soft:#5b5f6a;
+
+  --green:#2f6f4e;
+  --green-bg:#e4efe6;
+
+  --red:#a8402a;
+  --red-bg:#f4e5df;
+
+  --accent:#8a6d3b;
+
+  --card:#fffdf8;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+
+  margin:0;
+
+  background:var(--paper);
+
+  background-image:
+    linear-gradient(
+      var(--paper-line) 1px,
+      transparent 1px
+    );
+
+  background-size:100% 42px;
+
+  color:var(--ink);
+
+  font-family:'Inter',sans-serif;
+
+  padding:24px 16px 60px;
+
+  padding-top:
+    calc(24px + env(safe-area-inset-top));
+
+  padding-bottom:
+    calc(60px + env(safe-area-inset-bottom));
+}
+
+.wrap{
+
+  max-width:760px;
+
+  margin:0 auto;
+}
+
+header{
+
+  display:flex;
+
+  align-items:baseline;
+
+  justify-content:space-between;
+
+  border-bottom:3px solid var(--ink);
+
+  padding-bottom:10px;
+
+  margin-bottom:22px;
+}
+
+h1{
+
+  font-family:'Source Serif 4',serif;
+
+  font-size:26px;
+
+  margin:0;
+
+  letter-spacing:-0.01em;
+}
+
+.subtitle{
+
+  font-size:12px;
+
+  color:var(--ink-soft);
+
+  text-transform:uppercase;
+
+  letter-spacing:.08em;
+}
+
+.card{
+
+  background:var(--card);
+
+  border:1px solid var(--paper-line);
+
+  border-radius:4px;
+
+  padding:16px;
+
+  margin-bottom:16px;
+
+  box-shadow:0 1px 0 rgba(0,0,0,.02);
+}
+
+.card h2{
+
+  font-family:'Source Serif 4',serif;
+
+  font-size:15px;
+
+  margin:0 0 12px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+.tag{
+
+  font-size:10px;
+
+  font-weight:700;
+
+  letter-spacing:.06em;
+
+  text-transform:uppercase;
+
+  padding:2px 7px;
+
+  border-radius:20px;
+}
+
+.tag.entrada{
+
+  background:var(--green-bg);
+
+  color:var(--green);
+}
+
+.tag.saida{
+
+  background:var(--red-bg);
+
+  color:var(--red);
+}
+
+.row{
+
+  display:flex;
+
+  gap:8px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:8px;
+}
+
+.field{
+
+  flex:1 1 120px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+}
+
+label{
+
+  font-size:11px;
+
+  color:var(--ink-soft);
+
+  font-weight:600;
+
+  text-transform:uppercase;
+
+  letter-spacing:.04em;
+}
+
+input,
+select{
+
+  font-family:'Inter',sans-serif;
+
+  font-size:14px;
+
+  padding:9px 10px;
+
+  border:1px solid var(--paper-line);
+
+  border-radius:3px;
+
+  background:#fff;
+
+  color:var(--ink);
+}
+
+input:focus,
+select:focus{
+
+  outline:2px solid var(--accent);
+
+  outline-offset:1px;
+}
+
+input[type=number]{
+
+  font-family:'JetBrains Mono',monospace;
+}
+
+button{
+
+  font-family:'Inter',sans-serif;
+
+  font-weight:600;
+
+  font-size:13px;
+
+  padding:10px 16px;
+
+  border-radius:3px;
+
+  border:none;
+
+  cursor:pointer;
+
+  letter-spacing:.02em;
+}
+
+button:hover{
+
+  filter:brightness(1.08);
+}
+
+button:active{
+
+  transform:translateY(1px);
+}
+
+.btn-entrada{
+
+  background:var(--green);
+
+  color:#fff;
+}
+
+.btn-saida{
+
+  background:var(--red);
+
+  color:#fff;
+}
+
+.header-actions{
+
+  display:flex;
+
+  gap:8px;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+}
+
+.btn-toggle{
+
+  background:transparent;
+
+  border:1px solid var(--ink);
+
+  color:var(--ink);
+
+  font-size:11px;
+
+  padding:6px 10px;
+
+  border-radius:3px;
+
+  cursor:pointer;
+
+  font-weight:600;
+
+  font-family:'Inter',sans-serif;
+}
+
+.btn-toggle:hover{
+
+  background:var(--paper-line);
+}
+
+.btn-print{
+
+  background:var(--ink);
+
+  color:#fff;
+
+  font-size:11px;
+
+  padding:6px 10px;
+}
+
+.btn-print-ht{
+
+  background:var(--accent);
+
+  color:#fff;
+
+  font-size:11px;
+
+  padding:6px 10px;
+}
+
+.type-picker{
+
+  display:flex;
+
+  gap:6px;
+
+  margin-bottom:10px;
+
+  flex-wrap:wrap;
+}
+
+.type-picker button{
+
+  background:#fff;
+
+  border:1px solid var(--paper-line);
+
+  color:var(--ink-soft);
+
+  font-size:12px;
+
+  padding:7px 12px;
+}
+
+.type-picker button.active{
+
+  background:var(--ink);
+
+  color:#fff;
+
+  border-color:var(--ink);
+}
+
+.trip-bar{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  flex-wrap:wrap;
+
+  background:var(--card);
+
+  border:1px solid var(--paper-line);
+
+  border-left:4px solid var(--accent);
+
+  border-radius:4px;
+
+  padding:10px 14px;
+
+  margin-bottom:16px;
+}
+
+.trip-bar label{
+
+  white-space:nowrap;
+}
+
+.trip-bar input{
+
+  flex:1;
+}
+
+.trip-bar input.rate-input{
+
+  flex:0 1 110px;
+}
+
+.section-title{
+
+  font-family:'Source Serif 4',serif;
+
+  font-size:18px;
+
+  margin:30px 0 12px;
+
+  padding-bottom:8px;
+
+  border-bottom:2px solid var(--ink);
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+}
+
+.totals-bar{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:14px;
+
+  background:var(--ink);
+
+  color:#fff;
+
+  border-radius:4px;
+
+  padding:16px 18px;
+
+  margin-bottom:20px;
+
+  font-family:'JetBrains Mono',monospace;
+}
+
+.totals-row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  width:100%;
+}
+
+.totals-row div{
+
+  text-align:center;
+
+  flex:1;
+}
+
+.totals-divider{
+
+  border-top:1px dashed #5b5f6a;
+
+  margin:0 10px;
+}
+
+.totals-bar .label{
+
+  font-family:'Inter',sans-serif;
+
+  font-size:10px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.06em;
+
+  color:#c9c4b6;
+
+  margin-bottom:4px;
+}
+
+.totals-bar .val{
+
+  font-size:16px;
+
+  font-weight:700;
+}
+
+.totals-bar .val.pos{
+
+  color:#7fd4a3;
+}
+
+.totals-bar .val.neg{
+
+  color:#ef8b73;
+}
+
+table.ledger-table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+  font-family:'JetBrains Mono',monospace;
+
+  font-size:13px;
+}
+
+table.ledger-table th{
+
+  text-align:right;
+
+  font-family:'Inter',sans-serif;
+
+  font-size:10px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.05em;
+
+  color:var(--ink-soft);
+
+  padding:6px 8px;
+
+  border-bottom:2px solid var(--ink);
+}
+
+table.ledger-table th:first-child{
+
+  text-align:left;
+}
+
+table.ledger-table td{
+
+  padding:7px 8px;
+
+  text-align:right;
+
+  border-bottom:1px dashed var(--paper-line);
+}
+
+table.ledger-table td:first-child{
+
+  text-align:left;
+
+  font-family:'Inter',sans-serif;
+
+  font-weight:500;
+}
+
+table.ledger-table tr.total-row td{
+
+  border-top:1px dashed var(--ink);
+
+  border-bottom:none;
+
+  font-weight:700;
+
+  padding-top:9px;
+}
+
+table.ledger-table tr.total-row td:first-child{
+
+  font-family:'Inter',sans-serif;
+
+  text-transform:uppercase;
+
+  font-size:11px;
+
+  letter-spacing:.04em;
+}
+
+.pos{
+
+  color:var(--green);
+}
+
+.neg{
+
+  color:var(--red);
+}
+
+.muted{
+
+  color:var(--ink-soft);
+}
+
+.row-actions{
+
+  text-align:center !important;
+}
+
+.btn-del{
+
+  background:none;
+
+  border:1px solid var(--paper-line);
+
+  color:var(--red);
+
+  font-size:12px;
+
+  line-height:1;
+
+  padding:4px 7px;
+
+  border-radius:3px;
+
+  cursor:pointer;
+}
+
+.btn-del:hover{
+
+  background:var(--red-bg);
+
+  border-color:var(--red);
+}
+
+.month-group{
+
+  margin-bottom:18px;
+}
+
+.month-label{
+
+  font-family:'JetBrains Mono',monospace;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  text-transform:uppercase;
+
+  letter-spacing:.06em;
+
+  color:var(--ink-soft);
+
+  margin:0 0 8px;
+}
+
+.trip-card{
+
+  background:var(--card);
+
+  border:1px solid var(--paper-line);
+
+  border-radius:4px;
+
+  margin-bottom:8px;
+
+  overflow:hidden;
+}
+
+.trip-head{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  padding:10px 14px;
+
+  background:#efeadd;
+
+  cursor:pointer;
+
+  gap:10px;
+
+  flex-wrap:wrap;
+}
+
+.trip-name{
+
+  font-weight:700;
+
+  font-size:14px;
+
+  font-family:'Source Serif 4',serif;
+}
+
+.trip-range{
+
+  font-size:11px;
+
+  color:var(--ink-soft);
+
+  font-weight:400;
+
+  margin-left:8px;
+}
+
+.trip-right{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  flex-wrap:wrap;
+
+  justify-content:flex-end;
+}
+
+.trip-totals{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+
+  font-family:'JetBrains Mono',monospace;
+
+  font-size:12px;
+
+  text-align:right;
+}
+
+.trip-body{
+
+  padding:12px 14px;
+
+  display:none;
+}
+
+.trip-body.open{
+
+  display:block;
+}
+
+.empty{
+
+  text-align:center;
+
+  color:var(--ink-soft);
+
+  font-size:13px;
+
+  padding:30px 0;
+}
+
+.loading{
+
+  text-align:center;
+
+  color:var(--ink-soft);
+
+  padding:30px;
+}
+
+.user-info{
+
+  font-size:11px;
+
+  color:var(--ink-soft);
+
+  margin-top:4px;
+}
+
+.btn-voltar{
+
+  background:transparent;
+
+  border:1px solid var(--ink);
+
+  color:var(--ink);
+
+  font-size:11px;
+
+  padding:6px 10px;
+}
+
+@media(max-width:600px){
+
+  body{
+
+    padding-left:10px;
+
+    padding-right:10px;
+  }
+
+  .totals-row{
+
+    flex-direction:column;
+
+    gap:10px;
+  }
+
+  .totals-row div{
+
+    text-align:left;
+  }
+
+  .trip-right{
+
+    width:100%;
+
+    justify-content:flex-start;
+  }
+
+  .trip-totals{
+
+    text-align:left;
+  }
+
+  table.ledger-table{
+
+    font-size:11px;
+  }
+
+  table.ledger-table th,
+  table.ledger-table td{
+
+    padding:6px 4px;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="wrap">
+
+<header>
+
+  <div>
+
+    <h1>Controle de Viagens</h1>
+
+    <div class="subtitle">
+      Entradas gerais da viagem
+    </div>
+
+    <div
+      id="operadorInfo"
+      class="user-info">
+      Operador: Carregando...
+    </div>
+
+  </div>
+
+  <button
+    class="btn-voltar"
+    onclick="voltarPainel()">
+
+    ← Painel
+
+  </button>
+
+</header>
+
+
+<!-- =====================================================
+     VIAGEM ATUAL
+===================================================== -->
+
+<div class="trip-bar">
+
+  <label for="currentTrip">
+    Viagem atual
+  </label>
+
+  <select
+    id="currentTrip"
+    onchange="selecionarViagem()"
+    style="flex:1">
+
+    <option value="">
+      Carregando viagens...
+    </option>
+
+  </select>
+
+  <button
+    class="btn-toggle"
+    onclick="abrirNovaViagem()">
+
+    + Nova viagem
+
+  </button>
+
+</div>
+
+
+<!-- =====================================================
+     NOVA VIAGEM
+===================================================== -->
+
+<div
+  id="novaViagemCard"
+  class="card"
+  style="display:none">
+
+  <h2>
+    <span class="tag entrada">
+      VIAGEM
+    </span>
+
+    Nova viagem
+  </h2>
+
+  <div class="row">
+
+    <div class="field">
+
+      <label>
+        Nome da viagem
+      </label>
+
+      <input
+        type="text"
+        id="novaViagemNome"
+        placeholder="ex: São Paulo — agosto/2026">
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        Valor da diária
+      </label>
+
+      <input
+        type="number"
+        id="novaViagemDiaria"
+        step="0.01"
+        min="0"
+        placeholder="ex: 80,00">
+
+    </div>
+
+  </div>
+
+  <button
+    class="btn-entrada"
+    onclick="salvarNovaViagem()">
+
+    Criar viagem
+
+  </button>
+
+  <button
+    class="btn-toggle"
+    onclick="fecharNovaViagem()">
+
+    Cancelar
+
+  </button>
+
+</div>
+
+
+<!-- =====================================================
+     VIAGEM ATUAL — VALOR DA DIÁRIA
+===================================================== -->
+
+<div class="trip-bar">
+
+  <label>
+    Valor da diária
+  </label>
+
+  <input
+    type="number"
+    class="rate-input"
+    id="tripDailyRate"
+    step="0.01"
+    min="0"
+    readonly>
+
+  <button
+    class="btn-toggle"
+    onclick="editarDiaria()">
+
+    Editar diária
+
+  </button>
+
+</div>
+
+
+<!-- =====================================================
+     TOTAIS
+===================================================== -->
+
+<div
+  id="totalsBar"
+  class="totals-bar">
+
+  <div class="loading">
+
+    Carregando...
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     ENTRADA
+===================================================== -->
+
+<div class="card">
+
+  <h2>
+
+    <span class="tag entrada">
+      + Entrada
+    </span>
+
+    Lançamento de valores de hospedagem e transporte, se houver
+
+  </h2>
+
+
+  <div class="row">
+
+    <div class="field">
+
+      <label>
+        Data
+      </label>
+
+      <input
+        type="date"
+        id="inDate">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Valor (R$)
+      </label>
+
+      <input
+        type="number"
+        id="inValue"
+        step="0.01"
+        placeholder="ex: 1400,00">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Observação
+      </label>
+
+      <select id="inDesc">
+
+        <option value="TRANSPORTE">
+          TRANSPORTE
+        </option>
+
+        <option value="HOSPEDAGEM">
+          HOSPEDAGEM
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <p
+    style="
+      font-size:12px;
+      color:var(--ink-soft);
+      margin:-4px 0 12px;
+    ">
+
+    A diária definida no campo
+    "Valor da diária" é aplicada automaticamente
+    em cada dia. Este campo deve ser utilizado
+    somente para valores recebidos antecipadamente
+    da empresa para custos de viagem.
+
+  </p>
+
+
+  <button
+    class="btn-entrada"
+    onclick="addEntry('entrada')">
+
+    Registrar entrada
+
+  </button>
+
+</div>
+
+
+<!-- =====================================================
+     SAÍDA
+===================================================== -->
+
+<div class="card">
+
+  <h2>
+
+    <span class="tag saida">
+      − Saída
+    </span>
+
+    Gasto
+
+  </h2>
+
+
+  <div
+    class="type-picker"
+    id="typePicker">
+
+    <button
+      class="active"
+      data-t="gasto"
+      onclick="pickType('gasto')">
+
+      Gasto diário
+
+    </button>
+
+    <button
+      data-t="transporte"
+      onclick="pickType('transporte')">
+
+      Transporte
+
+    </button>
+
+    <button
+      data-t="hospedagem"
+      onclick="pickType('hospedagem')">
+
+      Hospedagem
+
+    </button>
+
+  </div>
+
+
+  <div class="row">
+
+    <div class="field">
+
+      <label>
+        Data
+      </label>
+
+      <input
+        type="date"
+        id="outDate">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Valor (R$)
+      </label>
+
+      <input
+        type="number"
+        id="outValue"
+        step="0.01"
+        placeholder="ex: 35,00">
+
+    </div>
+
+  </div>
+
+
+  <!-- TRANSPORTE -->
+
+  <div
+    class="row"
+    id="transporteRow"
+    style="display:none">
+
+    <div class="field">
+
+      <label>
+        Cidade de origem
+      </label>
+
+      <input
+        type="text"
+        id="cityFrom"
+        placeholder="Cidade X">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Cidade de destino
+      </label>
+
+      <input
+        type="text"
+        id="cityTo"
+        placeholder="Cidade Y">
+
+    </div>
+
+  </div>
+
+
+  <!-- GASTO -->
+
+  <div
+    class="row"
+    id="descRowGasto">
+
+    <div class="field">
+
+      <label>
+        Descrição
+      </label>
+
+      <select id="outDescGasto">
+
+        <option value="CAFÉ">
+          CAFÉ
+        </option>
+
+        <option value="ALMOÇO">
+          ALMOÇO
+        </option>
+
+        <option value="LANCHE">
+          LANCHE
+        </option>
+
+        <option value="JANTAR">
+          JANTAR
+        </option>
+
+        <option value="OUTROS">
+          OUTROS
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <!-- HOSPEDAGEM -->
+
+  <div
+    class="row"
+    id="descRowHospedagem"
+    style="display:none">
+
+    <div class="field">
+
+      <label>
+        Descrição da Hospedagem
+      </label>
+
+      <input
+        type="text"
+        id="outDescHospedagem"
+        placeholder="ex: Hotel X, Pousada Y (opcional)">
+
+    </div>
+
+  </div>
+
+
+  <button
+    class="btn-saida"
+    onclick="addEntry('saida')">
+
+    Registrar gasto
+
+  </button>
+
+</div>
+
+
+<!-- =====================================================
+     REGISTRO DIÁRIO
+===================================================== -->
+
+<div class="section-title">
+
+  <span id="currentTripHeading">
+    Registro diário
+  </span>
+
+  <div class="header-actions">
+
+    <button
+      id="btnToggleCurrent"
+      class="btn-toggle"
+      onclick="toggleCurrentTrip()">
+
+      Ocultar tabela
+
+    </button>
+
+    <button
+      class="btn-print-ht"
+      onclick="printCurrentTripHT()">
+
+      🖶 Imprimir H/T
+
+    </button>
+
+    <button
+      class="btn-print"
+      onclick="printCurrentTrip()">
+
+      🖶 Imprimir
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<div id="currentTripTable">
+
+  <div class="loading">
+    Carregando lançamentos...
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     HISTÓRICO
+===================================================== -->
+
+<div class="section-title">
+
+  Histórico mensal por viagem
+
+</div>
+
+
+<div id="monthly">
+
+  <div class="loading">
+    Carregando histórico...
+  </div>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================================================
+     SUPABASE
+===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="viagens.js"></script>
+
+
+<script>
+
+let operadorAtualLocal = null;
+
+let viagensLocal = [];
+
+let lancamentos = [];
+
+let viagemAtual = null;
+
+let currentType = 'gasto';
+
+let currentTripVisible = true;
+
+let openTrips = new Set();
+
+let tripNameMap = {};
+
+let isFirstEverLoad = true;
+
+
+const todayStr = () => {
+
+  const d = new Date();
+
+  const offset =
+    d.getTimezoneOffset();
+
+  const local =
+    new Date(
+      d.getTime() -
+      offset * 60000
+    );
+
+  return local
+    .toISOString()
+    .slice(0,10);
+
+};
+
+
+document.getElementById(
+  'inDate'
+).value = todayStr();
+
+
+document.getElementById(
+  'outDate'
+).value = todayStr();
+
+
+/* =====================================================
+   UTILITÁRIOS
+===================================================== */
+
+function fmt(v){
+
+  return Number(v || 0)
+    .toLocaleString(
+      'pt-BR',
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+
+}
+
+
+function escapeHtml(text){
+
+  return String(text || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+/* =====================================================
+   VOLTAR
+===================================================== */
+
+function voltarPainel(){
+
+  window.location.href =
+    'painel.html';
+
+}
+
+
+/* =====================================================
+   TIPO DE LANÇAMENTO
+===================================================== */
+
+function pickType(t){
+
+  currentType = t;
+
+  document
+    .querySelectorAll(
+      '#typePicker button'
+    )
+    .forEach(b => {
+
+      b.classList.toggle(
+        'active',
+        b.dataset.t === t
+      );
+
+    });
+
+
+  document.getElementById(
+    'transporteRow'
+  ).style.display =
+    t === 'transporte'
+      ? 'flex'
+      : 'none';
+
+
+  document.getElementById(
+    'descRowGasto'
+  ).style.display =
+    t === 'gasto'
+      ? 'flex'
+      : 'none';
+
+
+  document.getElementById(
+    'descRowHospedagem'
+  ).style.display =
+    t === 'hospedagem'
+      ? 'flex'
+      : 'none';
+
+}
+
+
+/* =====================================================
+   NOVA VIAGEM
+===================================================== */
+
+function abrirNovaViagem(){
+
+  document.getElementById(
+    'novaViagemCard'
+  ).style.display = 'block';
+
+}
+
+
+function fecharNovaViagem(){
+
+  document.getElementById(
+    'novaViagemCard'
+  ).style.display = 'none';
+
+}
+
+
+async function salvarNovaViagem(){
+
+  const nome =
+    document.getElementById(
+      'novaViagemNome'
+    ).value.trim();
+
+
+  const diaria =
+    parseFloat(
+      document.getElementById(
+        'novaViagemDiaria'
+      ).value
+    );
+
+
+  if(!nome){
+
+    alert(
+      'Informe o nome da viagem.'
+    );
+
+    return;
+
+  }
+
+
+  if(
+    isNaN(diaria) ||
+    diaria <= 0
+  ){
+
+    alert(
+      'Informe um valor de diária válido.'
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const viagem =
+      await criarViagem(
+        nome,
+        diaria
+      );
+
+
+    alert(
+      'Viagem criada com sucesso!'
+    );
+
+
+    document.getElementById(
+      'novaViagemNome'
+    ).value = '';
+
+
+    document.getElementById(
+      'novaViagemDiaria'
+    ).value = '';
+
+
+    fecharNovaViagem();
+
+
+    await carregarDadosPagina();
+
+
+    selecionarViagemPorId(
+      viagem.id
+    );
+
+
+  }catch(error){
+
+    console.error(
+      'ERRO AO CRIAR VIAGEM:',
+      error
+    );
+
+
+    alert(
+      error.message ||
+      'Não foi possível criar a viagem.'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CARREGAR LANÇAMENTOS
+===================================================== */
+
+async function carregarLancamentos(){
+
+  if(!operadorAtualLocal){
+
+    return [];
+
+  }
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+
+    .from('lancamentos')
+
+    .select(`
+      id,
+      operador_id,
+      viagem_id,
+      data,
+      tipo,
+      valor,
+      descricao,
+      cidade_origem,
+      cidade_destino,
+      created_at
+    `)
+
+    .eq(
+      'operador_id',
+      operadorAtualLocal.id
+    )
+
+    .order(
+      'data',
+      {
+        ascending:true
+      }
+    )
+
+    .order(
+      'created_at',
+      {
+        ascending:true
+      }
+    );
+
+
+  if(error){
+
+    console.error(
+      'ERRO AO CARREGAR LANÇAMENTOS:',
+      error
+    );
+
+    throw error;
+
+  }
+
+
+  lancamentos =
+    data || [];
+
+
+  console.log(
+    'LANÇAMENTOS CARREGADOS:',
+    lancamentos
+  );
+
+
+  return lancamentos;
+
+}
+
+
+/* =====================================================
+   CARREGAR DADOS DA PÁGINA
+===================================================== */
+
+async function carregarDadosPagina(){
+
+  try{
+
+    operadorAtualLocal =
+      await carregarOperadorAtual();
+
+
+    if(!operadorAtualLocal){
+
+      return;
+
+    }
+
+
+    document.getElementById(
+      'operadorInfo'
+    ).textContent =
+      `Operador: ${operadorAtualLocal.nome}`;
+
+
+    viagensLocal =
+      await carregarViagens();
+
+
+    await carregarLancamentos();
+
+
+    preencherViagens();
+
+
+    if(
+      viagensLocal.length > 0 &&
+      !viagemAtual
+    ){
+
+      viagemAtual =
+        viagensLocal[0];
+
+    }
+
+
+    atualizarInterface();
+
+
+  }catch(error){
+
+    console.error(
+      'ERRO AO CARREGAR CONTROLE DE VIAGENS:',
+      error
+    );
+
+
+    document.getElementById(
+      'currentTripTable'
+    ).innerHTML =
+      '<div class="empty">Não foi possível carregar o Controle de Viagens.</div>';
+
+  }
+
+}
+
+
+/* =====================================================
+   PREENCHER SELECT DE VIAGENS
+===================================================== */
+
+function preencherViagens(){
+
+  const select =
+    document.getElementById(
+      'currentTrip'
+    );
+
+
+  select.innerHTML = '';
+
+
+  if(
+    !viagensLocal ||
+    viagensLocal.length === 0
+  ){
+
+    select.innerHTML =
+      '<option value="">Nenhuma viagem cadastrada</option>';
+
+    viagemAtual = null;
+
+    return;
+
+  }
+
+
+  viagensLocal.forEach(
+    viagem => {
+
+      const option =
+        document.createElement(
+          'option'
+        );
+
+      option.value =
+        viagem.id;
+
+      option.textContent =
+        viagem.nome;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if(viagemAtual){
+
+    select.value =
+      viagemAtual.id;
+
+  }else{
+
+    select.value =
+      viagensLocal[0].id;
+
+    viagemAtual =
+      viagensLocal[0];
+
+  }
+
+}
+
+
+/* =====================================================
+   SELECIONAR VIAGEM
+===================================================== */
+
+function selecionarViagem(){
+
+  const id =
+    document.getElementById(
+      'currentTrip'
+    ).value;
+
+
+  viagemAtual =
+    viagensLocal.find(
+      viagem =>
+        String(viagem.id) ===
+        String(id)
+    ) || null;
+
+
+  atualizarInterface();
+
+}
+
+
+function selecionarViagemPorId(id){
+
+  viagemAtual =
+    viagensLocal.find(
+      viagem =>
+        String(viagem.id) ===
+        String(id)
+    ) || null;
+
+
+  const select =
+    document.getElementById(
+      'currentTrip'
+    );
+
+
+  if(viagemAtual){
+
+    select.value =
+      viagemAtual.id;
+
+  }
+
+
+  atualizarInterface();
+
+}
+
+
+/* =====================================================
+   DIÁRIA
+===================================================== */
+
+function atualizarDiariaInterface(){
+
+  const input =
+    document.getElementById(
+      'tripDailyRate'
+    );
+
+
+  if(viagemAtual){
+
+    input.value =
+      viagemAtual.valor_diaria || '';
+
+  }else{
+
+    input.value = '';
+
+  }
+
+}
+
+
+async function editarDiaria(){
+
+  if(!viagemAtual){
+
+    alert(
+      'Selecione uma viagem.'
+    );
+
+    return;
+
+  }
+
+
+  const novoValor =
+    prompt(
+      'Informe o novo valor da diária:',
+      viagemAtual.valor_diaria
+    );
+
+
+  if(
+    novoValor === null
+  ){
+
+    return;
+
+  }
+
+
+  const valor =
+    parseFloat(
+      String(novoValor)
+        .replace(',','.')
+    );
+
+
+  if(
+    isNaN(valor) ||
+    valor <= 0
+  ){
+
+    alert(
+      'Informe um valor válido.'
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const atualizada =
+      await atualizarViagem(
+        viagemAtual.id,
+        viagemAtual.nome,
+        valor
+      );
+
+
+    viagemAtual =
+      atualizada;
+
+
+    const index =
+      viagensLocal.findIndex(
+        v =>
+          v.id ===
+          atualizada.id
+      );
+
+
+    if(index >= 0){
+
+      viagensLocal[index] =
+        atualizada;
+
+    }
+
+
+    atualizarInterface();
+
+
+    alert(
+      'Valor da diária atualizado com sucesso!'
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      'Não foi possível atualizar a diária.'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   INSERIR LANÇAMENTO
+===================================================== */
+
+async function addEntry(kind){
+
+  if(!viagemAtual){
+
+    alert(
+      'Primeiro crie ou selecione uma viagem.'
+    );
+
+    return;
+
+  }
+
+
+  let date;
+
+  let value;
+
+  let desc = '';
+
+  let cidadeOrigem = null;
+
+  let cidadeDestino = null;
+
+
+  if(kind === 'entrada'){
+
+    date =
+      document.getElementById(
+        'inDate'
+      ).value;
+
+
+    value =
+      parseFloat(
+        document.getElementById(
+          'inValue'
+        ).value
+      );
+
+
+    desc =
+      document.getElementById(
+        'inDesc'
+      ).value;
+
+
+  }else{
+
+    date =
+      document.getElementById(
+        'outDate'
+      ).value;
+
+
+    value =
+      parseFloat(
+        document.getElementById(
+          'outValue'
+        ).value
+      );
+
+
+    if(
+      currentType ===
+      'transporte'
+    ){
+
+      cidadeOrigem =
+        document.getElementById(
+          'cityFrom'
+        ).value.trim();
+
+
+      cidadeDestino =
+        document.getElementById(
+          'cityTo'
+        ).value.trim();
+
+
+      if(
+        !cidadeOrigem ||
+        !cidadeDestino
+      ){
+
+        alert(
+          'Informe cidade de origem e destino.'
+        );
+
+        return;
+
+      }
+
+
+      desc =
+        `${cidadeOrigem} → ${cidadeDestino}`;
+
+    }
+
+
+    else if(
+      currentType ===
+      'hospedagem'
+    ){
+
+      desc =
+        document.getElementById(
+          'outDescHospedagem'
+        ).value.trim() ||
+        'Hospedagem';
+
+    }
+
+
+    else{
+
+      desc =
+        document.getElementById(
+          'outDescGasto'
+        ).value;
+
+    }
+
+  }
+
+
+  if(
+    !date ||
+    isNaN(value) ||
+    value <= 0
+  ){
+
+    alert(
+      'Preencha data e um valor válido.'
+    );
+
+    return;
+
+  }
+
+
+  let tipo;
+
+
+  if(kind === 'entrada'){
+
+    tipo =
+      'entrada';
+
+  }else{
+
+    tipo =
+      currentType;
+
+  }
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+
+      .from('lancamentos')
+
+      .insert({
+
+        operador_id:
+          operadorAtualLocal.id,
+
+        viagem_id:
+          viagemAtual.id,
+
+        data:
+          date,
+
+        tipo:
+          tipo,
+
+        valor:
+          value,
+
+        descricao:
+          desc,
+
+        cidade_origem:
+          cidadeOrigem,
+
+        cidade_destino:
+          cidadeDestino
+
+      })
+
+      .select()
+
+      .single();
+
+
+    if(error){
+
+      console.error(
+        'ERRO AO REGISTRAR LANÇAMENTO:',
+        error
+      );
+
+      alert(
+        error.message ||
+        'Não foi possível registrar o lançamento.'
+      );
+
+      return;
+
+    }
+
+
+    lancamentos.push(
+      data
+    );
+
+
+    document.getElementById(
+      kind === 'entrada'
+        ? 'inValue'
+        : 'outValue'
+    ).value = '';
+
+
+    if(
+      currentType ===
+      'transporte'
+    ){
+
+      document.getElementById(
+        'cityFrom'
+      ).value = '';
+
+
+      document.getElementById(
+        'cityTo'
+      ).value = '';
+
+    }
+
+
+    if(
+      currentType ===
+      'hospedagem'
+    ){
+
+      document.getElementById(
+        'outDescHospedagem'
+      ).value = '';
+
+    }
+
+
+    console.log(
+      'LANÇAMENTO REGISTRADO:',
+      data
+    );
+
+
+    atualizarInterface();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      'Erro ao registrar lançamento.'
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   EXCLUIR LANÇAMENTO
+===================================================== */
+
+async function deleteEntry(id){
+
+  if(
+    !confirm(
+      'Remover este lançamento? Essa ação não pode ser desfeita.'
+    )
+  ){
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      error
+    } = await supabaseClient
+
+      .from('lancamentos')
+
+      .delete()
+
+      .eq(
+        'id',
+        id
+      )
+
+      .eq(
+        'operador_id',
+        operadorAtualLocal.id
+      );
+
+
+    if(error){
+
+      console.error(
+        'ERRO AO EXCLUIR LANÇAMENTO:',
+        error
+      );
+
+      alert(
+        'Não foi possível remover o lançamento.'
+      );
+
+      return;
+
+    }
+
+
+    lancamentos =
+      lancamentos.filter(
+        e =>
+          e.id !== id
+      );
+
+
+    atualizarInterface();
+
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =====================================================
+   CÁLCULO
+===================================================== */
+
+function computeLedger(
+  list,
+  interactive,
+  dailyRate,
+  onlyHT = false
+){
+
+  const rate =
+    Number(dailyRate) > 0
+      ? Number(dailyRate)
+      : 0;
+
+
+  const byDate = {};
+
+
+  let totalAdiantamento = 0;
+
+  let totalHospTrans = 0;
+
+  let totalDiarias = 0;
+
+  let totalGastoDiario = 0;
+
+  let runningHT = 0;
+
+
+  list.forEach(e => {
+
+    if(
+      !byDate[e.data]
+    ){
+
+      byDate[e.data] = {
+
+        entradas:[],
+
+        gastos:[],
+
+        hospTrans:[]
+
+      };
+
+    }
+
+
+    if(
+      e.tipo ===
+      'entrada'
+    ){
+
+      byDate[e.data]
+        .entradas
+        .push(e);
+
+    }
+
+    else if(
+      e.tipo ===
+      'gasto'
+    ){
+
+      byDate[e.data]
+        .gastos
+        .push(e);
+
+    }
+
+    else{
+
+      byDate[e.data]
+        .hospTrans
+        .push(e);
+
+    }
+
+  });
+
+
+  const dates =
+    Object.keys(byDate)
+      .sort();
+
+
+  let bodyRows = '';
+
+
+  const delCell =
+    id =>
+      interactive
+
+        ? `
+          <td class="row-actions">
+
+            <button
+              class="btn-del"
+              title="Remover lançamento"
+              onclick="deleteEntry('${id}')">
+
+              ✕
+
+            </button>
+
+          </td>
+        `
+
+        : '';
+
+
+  const emptyCell =
+    () =>
+      interactive
+        ? '<td class="row-actions"></td>'
+        : '';
+
+
+  dates.forEach(date => {
+
+    const day =
+      byDate[date];
+
+
+    const dispDate =
+      new Date(
+        date +
+        'T12:00:00'
+      )
+      .toLocaleDateString(
+        'pt-BR'
+      );
+
+
+    let firstRow = true;
+
+
+    const dateCell = () => {
+
+      const html =
+        `<td>${
+          firstRow
+            ? dispDate
+            : ''
+        }</td>`;
+
+
+      firstRow = false;
+
+
+      return html;
+
+    };
+
+
+    /* ENTRADAS */
+
+    day.entradas
+      .slice()
+      .sort(
+        (a,b) =>
+          String(a.created_at)
+            .localeCompare(
+              String(b.created_at)
+            )
+      )
+      .forEach(e => {
+
+        runningHT +=
+          Number(e.valor);
+
+
+        totalAdiantamento +=
+          Number(e.valor);
+
+
+        bodyRows += `
+
+          <tr>
+
+            ${dateCell()}
+
+            <td class="muted">
+
+              <span
+                class="tag entrada"
+                style="margin-right:6px;">
+
+                Entrada H/T
+
+              </span>
+
+              ${escapeHtml(e.descricao)}
+
+            </td>
+
+            <td class="pos">
+
+              R$ ${fmt(e.valor)}
+
+            </td>
+
+            <td class="muted">
+              —
+            </td>
+
+            <td class="${
+              runningHT >= 0
+                ? 'muted'
+                : 'neg'
+            }">
+
+              R$ ${fmt(
+                Math.abs(runningHT)
+              )}
+
+              <span
+                style="font-size:9px">
+
+                H/T
+
+              </span>
+
+            </td>
+
+            ${delCell(e.id)}
+
+          </tr>
+
+        `;
+
+      });
+
+
+    /* HOSPEDAGEM / TRANSPORTE */
+
+    day.hospTrans
+      .slice()
+      .sort(
+        (a,b) =>
+          String(a.created_at)
+            .localeCompare(
+              String(b.created_at)
+            )
+      )
+      .forEach(e => {
+
+        runningHT -=
+          Number(e.valor);
+
+
+        totalHospTrans +=
+          Number(e.valor);
+
+
+        const lbl =
+          e.tipo ===
+          'hospedagem'
+            ? 'Hosp.'
+            : 'Transp.';
+
+
+        bodyRows += `
+
+          <tr>
+
+            ${dateCell()}
+
+            <td class="muted">
+
+              <span
+                class="tag saida"
+                style="margin-right:6px;">
+
+                ${lbl}
+
+              </span>
+
+              ${escapeHtml(e.descricao)}
+
+            </td>
+
+            <td class="muted">
+              —
+            </td>
+
+            <td class="neg">
+
+              R$ ${fmt(e.valor)}
+
+            </td>
+
+            <td class="${
+              runningHT >= 0
+                ? 'muted'
+                : 'neg'
+            }">
+
+              R$ ${fmt(
+                Math.abs(runningHT)
+              )}
+
+              <span
+                style="font-size:9px">
+
+                H/T
+
+              </span>
+
+            </td>
+
+            ${delCell(e.id)}
+
+          </tr>
+
+        `;
+
+      });
+
+
+    /* GASTOS DIÁRIOS */
+
+    if(!onlyHT){
+
+      const gastos =
+        day.gastos
+          .slice()
+          .sort(
+            (a,b) =>
+              String(a.created_at)
+                .localeCompare(
+                  String(b.created_at)
+                )
+          );
+
+
+      if(
+        gastos.length > 0
+      ){
+
+        let runningDia =
+          rate;
+
+
+        totalDiarias +=
+          rate;
+
+
+        gastos.forEach(
+          (e,idx) => {
+
+            runningDia -=
+              Number(e.valor);
+
+
+            totalGastoDiario +=
+              Number(e.valor);
+
+
+            bodyRows += `
+
+              <tr>
+
+                ${dateCell()}
+
+                <td class="muted">
+
+                  <span
+                    class="tag saida"
+                    style="
+                      margin-right:6px;
+                      background:var(--ink-soft);
+                      color:#fff;
+                    ">
+
+                    Gasto
+
+                  </span>
+
+                  ${escapeHtml(
+                    e.descricao
+                  )}
+
+                </td>
+
+                <td class="${
+                  idx === 0
+                    ? 'pos'
+                    : 'muted'
+                }">
+
+                  ${
+                    idx === 0
+                      ? 'R$ ' +
+                        fmt(rate)
+                      : '—'
+                  }
+
+                </td>
+
+                <td class="neg">
+
+                  R$ ${fmt(e.valor)}
+
+                </td>
+
+                <td class="${
+                  runningDia >= 0
+                    ? 'pos'
+                    : 'neg'
+                }">
+
+                  ${
+                    runningDia >= 0
+                      ? '+'
+                      : '−'
+                  }
+
+                  R$ ${fmt(
+                    Math.abs(
+                      runningDia
+                    )
+                  )}
+
+                  <span
+                    style="font-size:9px">
+
+                    DIA
+
+                  </span>
+
+                </td>
+
+                ${delCell(e.id)}
+
+              </tr>
+
+            `;
+
+          }
+        );
+
+      }
+
+    }
+
+  });
+
+
+  return {
+
+    bodyRows,
+
+    totalAdiantamento,
+
+    totalHospTrans,
+
+    saldoHT:
+      totalAdiantamento -
+      totalHospTrans,
+
+    totalDiarias,
+
+    totalGastoDiario,
+
+    saldoDiarias:
+      totalDiarias -
+      totalGastoDiario,
+
+    hasDates:
+      dates.length > 0
+
+  };
+
+}
+
+
+/* =====================================================
+   TABELA
+===================================================== */
+
+function buildTripTable(
+  list,
+  interactive,
+  dailyRate,
+  onlyHT = false
+){
+
+  const l =
+    computeLedger(
+      list,
+      interactive,
+      dailyRate,
+      onlyHT
+    );
+
+
+  if(
+    !l.hasDates
+  ){
+
+    return `
+      <div class="empty">
+
+        Nenhum lançamento
+        para esta viagem ainda.
+
+      </div>
+    `;
+
+  }
+
+
+  const lblAcertoHT =
+    l.saldoHT >= 0
+
+      ? `Devolver: R$ ${fmt(
+          l.saldoHT
+        )}`
+
+      : `Receber: R$ ${fmt(
+          Math.abs(
+            l.saldoHT
+          )
+        )}`;
+
+
+  let totalsRows = `
+
+    <tr class="total-row">
+
+      <td colspan="2">
+
+        Resumo Hosp./Transp.
+
+      </td>
+
+      <td class="pos">
+
+        R$ ${fmt(
+          l.totalAdiantamento
+        )}
+
+      </td>
+
+      <td class="neg">
+
+        R$ ${fmt(
+          l.totalHospTrans
+        )}
+
+      </td>
+
+      <td class="${
+        l.saldoHT >= 0
+          ? 'pos'
+          : 'neg'
+      }">
+
+        ${lblAcertoHT}
+
+      </td>
+
+      ${
+        interactive
+          ? '<td class="row-actions"></td>'
+          : ''
+      }
+
+    </tr>
+
+  `;
+
+
+  if(!onlyHT){
+
+    totalsRows += `
+
+      <tr class="total-row">
+
+        <td colspan="2">
+
+          Resumo Diárias
+
+        </td>
+
+        <td class="pos">
+
+          R$ ${fmt(
+            l.totalDiarias
+          )}
+
+        </td>
+
+        <td class="neg">
+
+          R$ ${fmt(
+            l.totalGastoDiario
+          )}
+
+        </td>
+
+        <td class="${
+          l.saldoDiarias >= 0
+            ? 'pos'
+            : 'neg'
+        }">
+
+          Saldo:
+
+          ${
+            l.saldoDiarias >= 0
+              ? '+'
+              : '−'
+          }
+
+          R$ ${fmt(
+            Math.abs(
+              l.saldoDiarias
+            )
+          )}
+
+        </td>
+
+        ${
+          interactive
+            ? '<td class="row-actions"></td>'
+            : ''
+        }
+
+      </tr>
+
+    `;
+
+  }
+
+
+  return `
+
+    <table class="ledger-table">
+
+      <thead>
+
+        <tr>
+
+          <th>Data</th>
+
+          <th>Lançamento</th>
+
+          <th>Crédito</th>
+
+          <th>Débito</th>
+
+          <th>Saldo</th>
+
+          ${
+            interactive
+              ? '<th></th>'
+              : ''
+          }
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${l.bodyRows}
+
+        ${totalsRows}
+
+      </tbody>
+
+    </table>
+
+  `;
+
+}
+
+
+/* =====================================================
+   TOTAIS
+===================================================== */
+
+function tripTotals(
+  list,
+  dailyRate
+){
+
+  const l =
+    computeLedger(
+      list,
+      false,
+      dailyRate
+    );
+
+
+  return {
+
+    adiantamento:
+      l.totalAdiantamento,
+
+    gastoHT:
+      l.totalHospTrans,
+
+    saldoHT:
+      l.saldoHT,
+
+    diarias:
+      l.totalDiarias,
+
+    gastoDiario:
+      l.totalGastoDiario,
+
+    saldoDiarias:
+      l.saldoDiarias
+
+  };
+
+}
+
+
+/* =====================================================
+   VISIBILIDADE
+===================================================== */
+
+function toggleCurrentTrip(){
+
+  currentTripVisible =
+    !currentTripVisible;
+
+
+  applyCurrentTripVisibility();
+
+}
+
+
+function applyCurrentTripVisibility(){
+
+  const table =
+    document.getElementById(
+      'currentTripTable'
+    );
+
+
+  const btn =
+    document.getElementById(
+      'btnToggleCurrent'
+    );
+
+
+  if(
+    table &&
+    btn
+  ){
+
+    table.style.display =
+      currentTripVisible
+        ? 'block'
+        : 'none';
+
+
+    btn.textContent =
+      currentTripVisible
+        ? 'Ocultar tabela'
+        : 'Mostrar tabela';
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER PRINCIPAL
+===================================================== */
+
+function atualizarInterface(){
+
+  atualizarDiariaInterface();
+
+
+  if(!viagemAtual){
+
+    document.getElementById(
+      'totalsBar'
+    ).innerHTML = `
+
+      <div class="empty"
+           style="color:#fff">
+
+        Crie uma viagem para começar.
+
+      </div>
+
+    `;
+
+
+    document.getElementById(
+      'currentTripHeading'
+    ).textContent =
+      'Registro diário';
+
+
+    document.getElementById(
+      'currentTripTable'
+    ).innerHTML = `
+
+      <div class="empty">
+
+        Nenhuma viagem selecionada.
+
+      </div>
+
+    `;
+
+
+    document.getElementById(
+      'monthly'
+    ).innerHTML =
+      '<div class="empty">Sem histórico ainda.</div>';
+
+
+    return;
+
+  }
+
+
+  const activeList =
+    lancamentos.filter(
+      e =>
+        String(e.viagem_id) ===
+        String(viagemAtual.id)
+    );
+
+
+  const activeRate =
+    Number(
+      viagemAtual.valor_diaria
+    ) || 0;
+
+
+  const t =
+    tripTotals(
+      activeList,
+      activeRate
+    );
+
+
+  const strAcertoHT =
+    t.saldoHT >= 0
+
+      ? `A DEVOLVER: R$ ${fmt(
+          t.saldoHT
+        )}`
+
+      : `A RECEBER: R$ ${fmt(
+          Math.abs(
+            t.saldoHT
+          )
+        )}`;
+
+
+  document.getElementById(
+    'totalsBar'
+  ).innerHTML = `
+
+    <div class="totals-row">
+
+      <div>
+
+        <div class="label">
+          Entrada (Hosp/Trans)
+        </div>
+
+        <div class="val pos">
+
+          R$ ${fmt(
+            t.adiantamento
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="label">
+          Gastos (Hosp/Trans)
+        </div>
+
+        <div class="val neg">
+
+          R$ ${fmt(
+            t.gastoHT
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="label">
+          Acerto Empresa
+        </div>
+
+        <div class="val ${
+          t.saldoHT >= 0
+            ? 'pos'
+            : 'neg'
+        }">
+
+          ${strAcertoHT}
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="totals-divider"></div>
+
+
+    <div class="totals-row">
+
+      <div>
+
+        <div class="label">
+          Diárias (Automático)
+        </div>
+
+        <div class="val pos">
+
+          R$ ${fmt(
+            t.diarias
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="label">
+          Gastos Diários
+        </div>
+
+        <div class="val neg">
+
+          R$ ${fmt(
+            t.gastoDiario
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <div class="label">
+          Saldo Diárias
+        </div>
+
+        <div class="val ${
+          t.saldoDiarias >= 0
+            ? 'pos'
+            : 'neg'
+        }">
+
+          R$ ${fmt(
+            t.saldoDiarias
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.getElementById(
+    'currentTripHeading'
+  ).textContent =
+    `Registro diário — ${viagemAtual.nome}`;
+
+
+  document.getElementById(
+    'currentTripTable'
+  ).innerHTML =
+    buildTripTable(
+      activeList,
+      true,
+      activeRate,
+      false
+    );
+
+
+  applyCurrentTripVisibility();
+
+
+  renderMonthly();
+
+}
+
+
+/* =====================================================
+   HISTÓRICO MENSAL
+===================================================== */
+
+const monthNames = [
+
+  'janeiro',
+  'fevereiro',
+  'março',
+  'abril',
+  'maio',
+  'junho',
+  'julho',
+  'agosto',
+  'setembro',
+  'outubro',
+  'novembro',
+  'dezembro'
+
+];
+
+
+function safeKeyFor(str){
+
+  return str
+    .replace(
+      /[^a-zA-Z0-9]/g,
+      '_'
+    )
+
+    + '_'
+
+    + Math.abs(
+        str
+          .split('')
+          .reduce(
+            (a,c) =>
+              a +
+              c.charCodeAt(0),
+            0
+          )
+      );
+
+}
+
+
+function renderMonthly(){
+
+  const monthlyEl =
+    document.getElementById(
+      'monthly'
+    );
+
+
+  if(
+    lancamentos.length === 0
+  ){
+
+    monthlyEl.innerHTML =
+      '<div class="empty">Sem histórico ainda.</div>';
+
+    return;
+
+  }
+
+
+  const byMonth = {};
+
+
+  lancamentos.forEach(e => {
+
+    const monthKey =
+      String(e.data)
+        .slice(0,7);
+
+
+    const viagem =
+      viagensLocal.find(
+        v =>
+          String(v.id) ===
+          String(e.viagem_id)
+      );
+
+
+    if(!viagem){
+
+      return;
+
+    }
+
+
+    const trip =
+      viagem.nome;
+
+
+    if(
+      !byMonth[monthKey]
+    ){
+
+      byMonth[monthKey] = {};
+
+    }
+
+
+    if(
+      !byMonth[monthKey][trip]
+    ){
+
+      byMonth[monthKey][trip] = [];
+
+    }
+
+
+    byMonth[monthKey][trip]
+      .push(e);
+
+  });
+
+
+  const monthKeys =
+    Object.keys(
+      byMonth
+    )
+    .sort(
+      (a,b) =>
+        b.localeCompare(a)
+    );
+
+
+  tripNameMap = {};
+
+  let isFirstCard = true;
+
+
+  monthlyEl.innerHTML =
+    monthKeys.map(
+      monthKey => {
+
+        const [
+          y,
+          m
+        ] =
+          monthKey.split('-');
+
+
+        const label =
+          `${monthNames[
+            parseInt(m,10)-1
+          ]} de ${y}`;
+
+
+        const trips =
+          byMonth[monthKey];
+
+
+        const tripNames =
+          Object.keys(
+            trips
+          ).sort();
+
+
+        const tripCards =
+          tripNames
+            .map(
+              tripName => {
+
+                const list =
+                  trips[
+                    tripName
+                  ];
+
+
+                const viagem =
+                  viagensLocal.find(
+                    v =>
+                      v.nome ===
+                      tripName
+                  );
+
+
+                if(!viagem){
+
+                  return '';
+
+                }
+
+
+                const rate =
+                  Number(
+                    viagem.valor_diaria
+                  ) || 0;
+
+
+                const tt =
+                  tripTotals(
+                    list,
+                    rate
+                  );
+
+
+                const tDates =
+                  [
+                    ...new Set(
+                      list.map(
+                        e => e.data
+                      )
+                    )
+                  ]
+                  .sort();
+
+
+                const range =
+                  tDates.length > 1
+
+                    ? `${
+                        new Date(
+                          tDates[0] +
+                          'T12:00:00'
+                        )
+                        .toLocaleDateString(
+                          'pt-BR'
+                        )
+                      } – ${
+                        new Date(
+                          tDates[
+                            tDates.length-1
+                          ] +
+                          'T12:00:00'
+                        )
+                        .toLocaleDateString(
+                          'pt-BR'
+                        )
+                      }`
+
+                    : new Date(
+                        tDates[0] +
+                        'T12:00:00'
+                      )
+                      .toLocaleDateString(
+                        'pt-BR'
+                      );
+
+
+                const safeKey =
+                  safeKeyFor(
+                    monthKey +
+                    '|' +
+                    viagem.id
+                  );
+
+
+                tripNameMap[
+                  safeKey
+                ] =
+                  viagem.id;
+
+
+                let isOpen = false;
+
+
+                if(
+                  isFirstEverLoad &&
+                  isFirstCard
+                ){
+
+                  isOpen = true;
+
+                  openTrips.add(
+                    safeKey
+                  );
+
+                }
+
+                else if(
+                  openTrips.has(
+                    safeKey
+                  )
+                ){
+
+                  isOpen = true;
+
+                }
+
+
+                isFirstCard = false;
+
+
+                return `
+
+                  <div class="trip-card">
+
+                    <div
+                      class="trip-head"
+                      onclick="toggleTrip('${safeKey}')">
+
+                      <span class="trip-name">
+
+                        ${escapeHtml(
+                          tripName
+                        )}
+
+                        <span class="trip-range">
+
+                          ${range}
+
+                          ·
+
+                          ${
+                            tDates.length
+                          }
+
+                          dia${
+                            tDates.length > 1
+                              ? 's'
+                              : ''
+                          }
+
+                        </span>
+
+                      </span>
+
+
+                      <span class="trip-right">
+
+                        <span class="trip-totals">
+
+                          <span>
+
+                            <span
+                              class="muted"
+                              style="font-size:10px">
+
+                              HOSP/TRANSP:
+
+                            </span>
+
+                            <span
+                              class="${
+                                tt.saldoHT >= 0
+                                  ? 'pos'
+                                  : 'neg'
+                              }">
+
+                              ${
+                                tt.saldoHT >= 0
+                                  ? 'devolver'
+                                  : 'receber'
+                              }
+
+                              R$ ${fmt(
+                                Math.abs(
+                                  tt.saldoHT
+                                )
+                              )}
+
+                            </span>
+
+                          </span>
+
+
+                          <span>
+
+                            <span
+                              class="muted"
+                              style="font-size:10px">
+
+                              DIÁRIAS:
+
+                            </span>
+
+                            <span
+                              class="${
+                                tt.saldoDiarias >= 0
+                                  ? 'pos'
+                                  : 'neg'
+                              }">
+
+                              saldo
+
+                              R$ ${fmt(
+                                Math.abs(
+                                  tt.saldoDiarias
+                                )
+                              )}
+
+                            </span>
+
+                          </span>
+
+                        </span>
+
+
+                        <button
+                          class="btn-toggle btn-toggle-trip"
+                          onclick="
+                            event.stopPropagation();
+                            toggleTrip('${safeKey}')
+                          ">
+
+                          ${
+                            isOpen
+                              ? 'Ocultar tabela'
+                              : 'Mostrar tabela'
+                          }
+
+                        </button>
+
+
+                        <button
+                          class="btn-print-ht"
+                          onclick="
+                            event.stopPropagation();
+                            printTripByKeyHT('${safeKey}')
+                          ">
+
+                          🖶 Imprimir H/T
+
+                        </button>
+
+
+                        <button
+                          class="btn-print"
+                          onclick="
+                            event.stopPropagation();
+                            printTripByKey('${safeKey}')
+                          ">
+
+                          🖶 Imprimir
+
+                        </button>
+
+                      </span>
+
+                    </div>
+
+
+                    <div
+                      class="
+                        trip-body
+                        ${
+                          isOpen
+                            ? 'open'
+                            : ''
+                        }
+                      "
+                      id="trip-${safeKey}">
+
+                      ${buildTripTable(
+                        list,
+                        true,
+                        rate,
+                        false
+                      )}
+
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join('');
+
+
+        return `
+
+          <div class="month-group">
+
+            <div class="month-label">
+
+              ${label}
+
+            </div>
+
+            ${tripCards}
+
+          </div>
+
+        `;
+
+      }
+    )
+    .join('');
+
+
+  isFirstEverLoad = false;
+
+}
+
+
+/* =====================================================
+   ABRIR / FECHAR HISTÓRICO
+===================================================== */
+
+function toggleTrip(key){
+
+  if(
+    openTrips.has(key)
+  ){
+
+    openTrips.delete(key);
+
+  }else{
+
+    openTrips.add(key);
+
+  }
+
+
+  const body =
+    document.getElementById(
+      'trip-' + key
+    );
+
+
+  if(body){
+
+    body.classList.toggle(
+      'open'
+    );
+
+
+    const btn =
+      body
+        .previousElementSibling
+        .querySelector(
+          '.btn-toggle-trip'
+        );
+
+
+    if(btn){
+
+      btn.textContent =
+        body.classList.contains(
+          'open'
+        )
+
+          ? 'Ocultar tabela'
+
+          : 'Mostrar tabela';
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   IMPRESSÃO
+===================================================== */
+
+function printTripGeneric(
+  viagemId,
+  onlyHT = false
+){
+
+  const viagem =
+    viagensLocal.find(
+      v =>
+        String(v.id) ===
+        String(viagemId)
+    );
+
+
+  if(!viagem){
+
+    alert(
+      'Viagem não encontrada.'
+    );
+
+    return;
+
+  }
+
+
+  const list =
+    lancamentos.filter(
+      e =>
+        String(e.viagem_id) ===
+        String(viagem.id)
+    );
+
+
+  const rate =
+    Number(
+      viagem.valor_diaria
+    ) || 0;
+
+
+  const tableHtml =
+    buildTripTable(
+      list,
+      false,
+      rate,
+      onlyHT
+    );
+
+
+  const w =
+    window.open(
+      '',
+      '_blank'
+    );
+
+
+  if(!w){
+
+    alert(
+      'Permita pop-ups para imprimir.'
+    );
+
+    return;
+
+  }
+
+
+  const titleStr =
+    onlyHT
+
+      ? `Acerto H/T - ${viagem.nome}`
+
+      : `Relatório Completo - ${viagem.nome}`;
+
+
+  const headerStr =
+    onlyHT
+
+      ? 'Acerto de Hospedagem e Transporte'
+
+      : 'Relatório Geral de Viagem';
+
+
+  const dateStr =
+    new Date()
+      .toLocaleDateString(
+        'pt-BR',
+        {
+          day:'2-digit',
+          month:'long',
+          year:'numeric',
+          hour:'2-digit',
+          minute:'2-digit'
+        }
+      );
+
+
+  w.document.write(`
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+${escapeHtml(titleStr)}
+</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+  rel="stylesheet">
+
+<style>
+
+:root{
+
+  --green:#2f6f4e;
+
+  --red:#a8402a;
+
+  --ink:#20242b;
+
+  --ink-soft:#5b5f6a;
+
+  --border-color:#ded7c4;
+
+}
+
+@page{
+
+  margin:15mm;
+}
+
+body{
+
+  font-family:'Inter',sans-serif;
+
+  color:var(--ink);
+
+  margin:0;
+
+  padding:0;
+
+  background:#fff;
+
+  -webkit-print-color-adjust:exact;
+
+  print-color-adjust:exact;
+}
+
+.print-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-end;
+
+  border-bottom:2px solid var(--ink);
+
+  padding-bottom:16px;
+
+  margin-bottom:24px;
+}
+
+.print-header-left h1{
+
+  font-size:22px;
+
+  margin:0 0 6px 0;
+
+  font-weight:700;
+}
+
+.print-header-left h2{
+
+  font-size:16px;
+
+  margin:0;
+
+  color:var(--ink-soft);
+
+  font-weight:500;
+}
+
+.print-header-right{
+
+  text-align:right;
+
+  font-size:11px;
+
+  color:var(--ink-soft);
+}
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+  font-size:12px;
+}
+
+th{
+
+  text-align:right;
+
+  font-size:10px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.05em;
+
+  color:var(--ink-soft);
+
+  padding:10px 8px;
+
+  border-bottom:1px solid var(--border-color);
+
+  background-color:#f6f3ec;
+}
+
+th:first-child{
+
+  text-align:left;
+}
+
+td{
+
+  padding:10px 8px;
+
+  text-align:right;
+
+  border-bottom:1px dashed var(--border-color);
+}
+
+td:first-child{
+
+  text-align:left;
+
+  font-weight:500;
+}
+
+td:nth-child(n+3){
+
+  font-family:'JetBrains Mono',monospace;
+}
+
+tr.total-row td{
+
+  border-top:1px solid var(--ink);
+
+  border-bottom:none;
+
+  font-weight:700;
+
+  background:#fffdf8;
+
+  padding-top:12px;
+
+  padding-bottom:12px;
+}
+
+.pos{
+
+  color:var(--green);
+}
+
+.neg{
+
+  color:var(--red);
+}
+
+.muted{
+
+  color:var(--ink-soft);
+}
+
+.footer{
+
+  margin-top:40px;
+
+  text-align:center;
+
+  font-size:10px;
+
+  color:var(--ink-soft);
+
+  border-top:1px solid var(--border-color);
+
+  padding-top:16px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="print-header">
+
+  <div class="print-header-left">
+
+    <h1>
+      ${escapeHtml(viagem.nome)}
+    </h1>
+
+    <h2>
+      ${headerStr}
+    </h2>
+
+  </div>
+
+  <div class="print-header-right">
+
+    Gerado em<br>
+
+    <strong>
+      ${dateStr}
+    </strong>
+
+  </div>
+
+</div>
+
+${tableHtml}
+
+<div class="footer">
+
+  Relatório gerado através do Controle de Viagens
+
+</div>
+
+</body>
+
+</html>
+
+  `);
+
+
+  w.document.close();
+
+  w.focus();
+
+  setTimeout(
+    () => w.print(),
+    400
+  );
+
+}
+
+
+function printTripByKey(
+  safeKey
+){
+
+  const viagemId =
+    tripNameMap[
+      safeKey
+    ];
+
+
+  if(viagemId){
+
+    printTripGeneric(
+      viagemId,
+      false
+    );
+
+  }
+
+}
+
+
+function printTripByKeyHT(
+  safeKey
+){
+
+  const viagemId =
+    tripNameMap[
+      safeKey
+    ];
+
+
+  if(viagemId){
+
+    printTripGeneric(
+      viagemId,
+      true
+    );
+
+  }
+
+}
+
+
+function printCurrentTrip(){
+
+  if(
+    viagemAtual
+  ){
+
+    printTripGeneric(
+      viagemAtual.id,
+      false
+    );
+
+  }
+
+}
+
+
+function printCurrentTripHT(){
+
+  if(
+    viagemAtual
+  ){
+
+    printTripGeneric(
+      viagemAtual.id,
+      true
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
+
+async function iniciarPagina(){
+
+  console.log(
+    'INICIANDO CONTROLE DE VIAGENS...'
+  );
+
+
+  try{
+
+    await carregarDadosPagina();
+
+
+    console.log(
+      'CONTROLE DE VIAGENS CARREGADO.'
+    );
+
+
+  }catch(error){
+
+    console.error(
+      'ERRO AO INICIAR CONTROLE DE VIAGENS:',
+      error
+    );
+
+  }
+
+}
+
+
+iniciarPagina();
+
+</script>
+
+</body>
+
+</html>

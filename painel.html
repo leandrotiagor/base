@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Painel - Sistema</title>
+
+
+    <!-- ==============================
+         CSS
+    =============================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <!-- ==============================
+         PWA / MANIFEST
+    =============================== -->
+
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
+
+    <meta
+        name="theme-color"
+        content="#111827"
+    >
+
+
+    <!-- ÍCONES -->
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="icon-192.png"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="512x512"
+        href="icon-512.png"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="painel-container">
+
+
+        <!-- ==============================
+             CABEÇALHO
+        =============================== -->
+
+        <header class="painel-header">
+
+            <div>
+
+                <h1>
+                    SISTEMA
+                </h1>
+
+                <p id="nomeUsuario">
+                    Carregando...
+                </p>
+
+            </div>
+
+
+            <button
+                id="btnSair"
+                class="btn-sair"
+                type="button"
+            >
+                Sair
+            </button>
+
+        </header>
+
+
+        <!-- ==============================
+             CONTEÚDO
+        =============================== -->
+
+        <main>
+
+            <h2>
+                Módulos
+            </h2>
+
+
+            <!-- MÓDULOS -->
+
+            <div
+                id="modulos"
+                class="modulos-grid"
+            >
+
+                <p>
+                    Carregando módulos...
+                </p>
+
+            </div>
+
+
+            <!-- ==============================
+                 ADMINISTRAÇÃO
+            =============================== -->
+
+            <div
+                id="adminArea"
+                style="display: none;"
+            >
+
+                <button
+                    id="btnAdministracao"
+                    type="button"
+                >
+                    ⚙️ Administração
+                </button>
+
+            </div>
+
+
+        </main>
+
+    </div>
+
+
+    <!-- ==============================
+         SUPABASE
+    =============================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <!-- ==============================
+         CONFIGURAÇÃO SUPABASE
+    =============================== -->
+
+    <script src="supabase.js"></script>
+
+
+    <!-- ==============================
+         PAINEL
+    =============================== -->
+
+    <script src="painel.js"></script>
+
+
+</body>
+
+</html>

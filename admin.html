@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Administração</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .topo h2 {
+            margin: 0;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-voltar {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-novo {
+            background: #111827;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .ativo {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .inativo {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .mensagem {
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        /* ==============================
+           MODAIS
+        ============================== */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal-conteudo {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-cabecalho h2 {
+            margin: 0;
+        }
+
+        .modal-cabecalho button {
+            background: transparent;
+            font-size: 28px;
+            padding: 0 8px;
+        }
+
+        /* ==============================
+           FORMULÁRIO
+        ============================== */
+
+        #formOperador {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #formOperador label {
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        #formOperador input,
+        #formOperador select,
+        #modalEditarOperador input,
+        #modalEditarOperador select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        #formOperador input:focus,
+        #formOperador select:focus,
+        #modalEditarOperador input:focus,
+        #modalEditarOperador select:focus {
+            outline: none;
+            border-color: #111827;
+        }
+
+        #formOperador .checkbox,
+        .checkbox-ativo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+            margin-top: 15px;
+        }
+
+        #formOperador .checkbox input,
+        .checkbox-ativo input {
+            width: auto;
+        }
+
+        .modal-acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancelar {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-salvar {
+            background: #111827;
+            color: white;
+        }
+
+        .fechar-modal {
+            background: transparent;
+            font-size: 28px;
+        }
+
+        /* ==============================
+           RESPONSIVO
+        ============================== */
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 15px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 0 10px;
+            }
+
+            .topo {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .topo button {
+                width: 100%;
+            }
+
+            th,
+            td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ==============================
+         CABEÇALHO
+    =============================== -->
+
+    <header>
+
+        <h1>
+            ⚙️ Administração
+        </h1>
+
+        <button
+            class="btn-voltar"
+            id="btnVoltar"
+            type="button"
+        >
+            ← Voltar
+        </button>
+
+    </header>
+
+
+    <!-- ==============================
+         CONTEÚDO
+    =============================== -->
+
+    <div class="container">
+
+        <div class="topo">
+
+            <h2>
+                👤 Operadores
+            </h2>
+
+            <button
+                class="btn-novo"
+                id="btnNovoOperador"
+                type="button"
+            >
+                + Novo operador
+            </button>
+
+        </div>
+
+
+        <!-- ==============================
+             TABELA
+        =============================== -->
+
+        <div class="card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="listaOperadores">
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="mensagem"
+                        >
+                            Carregando operadores...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         MODAL NOVO OPERADOR
+    =============================== -->
+
+    <div
+        id="modalOperador"
+        class="modal"
+        style="display: none;"
+    >
+
+        <div class="modal-conteudo">
+
+            <div class="modal-cabecalho">
+
+                <h2>
+                    ➕ Novo operador
+                </h2>
+
+                <button
+                    type="button"
+                    id="btnFecharModal"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="formOperador">
+
+                <label for="nomeOperador">
+                    Nome
+                </label>
+
+                <input
+                    type="text"
+                    id="nomeOperador"
+                    required
+                    placeholder="Nome completo"
+                >
+
+
+                <label for="cpfOperador">
+                    CPF
+                </label>
+
+                <input
+                    type="text"
+                    id="cpfOperador"
+                    required
+                    placeholder="Somente números"
+                    maxlength="11"
+                >
+
+
+                <label for="emailOperador">
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="emailOperador"
+                    required
+                    placeholder="E-mail do operador"
+                >
+
+
+                <label for="senhaOperador">
+                    Senha inicial
+                </label>
+
+                <input
+                    type="password"
+                    id="senhaOperador"
+                    required
+                    minlength="6"
+                    placeholder="Mínimo de 6 caracteres"
+                >
+
+
+                <label for="perfilOperador">
+                    Perfil
+                </label>
+
+                <select id="perfilOperador">
+
+                    <option value="operador">
+                        Operador
+                    </option>
+
+                    <option value="admin">
+                        Administrador
+                    </option>
+
+                </select>
+
+
+                <label class="checkbox">
+
+                    <input
+                        type="checkbox"
+                        id="ativoOperador"
+                        checked
+                    >
+
+                    Usuário ativo
+
+                </label>
+
+
+                <div class="modal-acoes">
+
+                    <button
+                        type="button"
+                        class="btn-cancelar"
+                        id="btnCancelarOperador"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-novo"
+                    >
+                        Cadastrar operador
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         MODAL PERMISSÕES
+    =============================== -->
+
+    <div
+        id="modalPermissoes"
+        class="modal"
+        style="display: none;"
+    >
+
+        <div class="modal-conteudo">
+
+            <div class="modal-cabecalho">
+
+                <h2>
+                    Permissões
+                </h2>
+
+                <button
+                    class="fechar-modal"
+                    type="button"
+                    onclick="fecharPermissoes()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <p>
+                Operador:
+                <strong id="nomeOperadorPermissao"></strong>
+            </p>
+
+            <div id="listaPermissoes">
+                Carregando módulos...
+            </div>
+
+            <div class="modal-acoes">
+
+                <button
+                    class="btn-cancelar"
+                    type="button"
+                    onclick="fecharPermissoes()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="btn-salvar"
+                    type="button"
+                    onclick="salvarPermissoes()"
+                >
+                    Salvar permissões
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         MODAL EDITAR OPERADOR
+    =============================== -->
+
+    <div
+        id="modalEditarOperador"
+        class="modal"
+        style="display: none;"
+    >
+
+        <div class="modal-conteudo">
+
+            <div class="modal-cabecalho">
+
+                <h2>
+                    Editar operador
+                </h2>
+
+                <button
+                    class="fechar-modal"
+                    type="button"
+                    onclick="fecharEdicaoOperador()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <input
+                type="hidden"
+                id="editarOperadorId"
+            >
+
+
+            <label for="editarNome">
+                Nome
+            </label>
+
+            <input
+                type="text"
+                id="editarNome"
+                placeholder="Nome completo"
+            >
+
+
+            <label for="editarCpf">
+                CPF
+            </label>
+
+            <input
+                type="text"
+                id="editarCpf"
+                maxlength="11"
+                placeholder="Somente números"
+            >
+
+
+            <label for="editarPerfil">
+                Perfil
+            </label>
+
+            <select id="editarPerfil">
+
+                <option value="operador">
+                    Operador
+                </option>
+
+                <option value="admin">
+                    Administrador
+                </option>
+
+            </select>
+
+
+            <label class="checkbox-ativo">
+
+                <input
+                    type="checkbox"
+                    id="editarAtivo"
+                >
+
+                Operador ativo
+
+            </label>
+
+
+            <div class="modal-acoes">
+
+                <button
+                    class="btn-cancelar"
+                    type="button"
+                    onclick="fecharEdicaoOperador()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="btn-salvar"
+                    type="button"
+                    onclick="salvarEdicaoOperador()"
+                >
+                    Salvar alterações
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         SCRIPTS
+    =============================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
+    <script src="admin.js"></script>
+
+
+    <!-- ==============================
+         BOTÃO VOLTAR
+    =============================== -->
+
+    <script>
+
+        document
+            .getElementById('btnVoltar')
+            .addEventListener('click', function () {
+
+                window.location.href = 'painel.html';
+
+            });
+
+    </script>
+
+</body>
+
+</html>

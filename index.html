@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sistema - Login</title>
+
+
+    <!-- ==============================
+         CSS
+    =============================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <!-- ==============================
+         PWA / MANIFEST
+    =============================== -->
+
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
+
+    <meta
+        name="theme-color"
+        content="#111827"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="icon-192.png"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="512x512"
+        href="icon-512.png"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- ==============================
+         LOGIN
+    =============================== -->
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="logo">
+
+                <h1>
+                    SISTEMA
+                </h1>
+
+            </div>
+
+
+            <p class="subtitle">
+                Acesso ao sistema
+            </p>
+
+
+            <form id="loginForm">
+
+
+                <!-- CPF -->
+
+                <div class="form-group">
+
+                    <label for="cpf">
+                        CPF
+                    </label>
+
+                    <input
+                        type="text"
+                        id="cpf"
+                        placeholder="000.000.000-00"
+                        maxlength="14"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- SENHA -->
+
+                <div class="form-group">
+
+                    <label for="senha">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    type="submit"
+                    class="btn-login"
+                >
+                    ENTRAR
+                </button>
+
+
+            </form>
+
+
+            <div class="footer">
+                Sistema © 2026
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         SUPABASE
+    =============================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <!-- ==============================
+         CONFIGURAÇÃO SUPABASE
+    =============================== -->
+
+    <script src="supabase.js"></script>
+
+
+    <!-- ==============================
+         LOGIN
+    =============================== -->
+
+    <script src="login.js"></script>
+
+
+</body>
+
+</html>
