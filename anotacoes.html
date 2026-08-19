@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+
+<title>Anotações - Leandro Sistemas</title>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#20242b">
+
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root{
+  --paper:#f6f3ec;
+  --paper-line:#ded7c4;
+  --ink:#20242b;
+  --ink-soft:#5b5f6a;
+  --accent:#8a6d3b;
+  --card:#fffdf8;
+  --red:#a8402a;
+  --red-bg:#f4e5df;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:var(--paper);
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+  background-size:100% 42px;
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  padding:24px 16px 60px;
+  padding-top: calc(24px + env(safe-area-inset-top));
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+}
+
+.wrap{
+  max-width:720px;
+  margin:0 auto;
+}
+
+header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:28px;
+}
+
+header h1{
+  font-size:22px;
+  margin:0 0 4px;
+}
+
+.subtitle{
+  color:var(--ink-soft);
+  font-size:13px;
+}
+
+.user-info{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--ink-soft);
+}
+
+.btn-voltar{
+  border:1px solid var(--paper-line);
+  background:var(--card);
+  color:var(--ink);
+  padding:10px 16px;
+  border-radius:8px;
+  font-size:13px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.btn-voltar:hover{
+  background:#f0ece1;
+}
+
+.card-nova{
+  background:var(--card);
+  border:1px solid var(--paper-line);
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:30px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.card-nova textarea{
+  width:100%;
+  min-height:120px;
+  resize:vertical;
+  border:1px solid var(--paper-line);
+  border-radius:10px;
+  padding:12px 14px;
+  font-family:'Inter',sans-serif;
+  font-size:15px;
+  color:var(--ink);
+  outline:none;
+  background:#fff;
+}
+
+.card-nova textarea:focus{
+  border-color:var(--accent);
+}
+
+.card-nova .acoes{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:12px;
+}
+
+.btn-salvar{
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  padding:11px 22px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-salvar:hover{
+  opacity:0.9;
+}
+
+.btn-salvar:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+.section-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink-soft);
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  margin-bottom:14px;
+}
+
+.lista-anotacoes{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.anotacao-card{
+  background:var(--card);
+  border:1px solid var(--paper-line);
+  border-radius:12px;
+  padding:16px 18px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.04);
+}
+
+.anotacao-card .data{
+  font-size:11px;
+  color:var(--ink-soft);
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:8px;
+}
+
+.anotacao-card .texto{
+  font-size:15px;
+  line-height:1.5;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.anotacao-card .rodape{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:10px;
+}
+
+.btn-excluir{
+  border:none;
+  background:var(--red-bg);
+  color:var(--red);
+  padding:6px 12px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.btn-excluir:hover{
+  opacity:0.85;
+}
+
+.vazio{
+  color:var(--ink-soft);
+  font-size:14px;
+  text-align:center;
+  padding:30px 0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+
+  <div>
+
+    <h1>Anotações</h1>
+
+    <div class="subtitle">
+      Suas anotações diárias
+    </div>
+
+    <div id="operadorInfo" class="user-info">
+      Operador: Carregando...
+    </div>
+
+  </div>
+
+  <button class="btn-voltar" onclick="voltarPainel()">
+    ← Painel
+  </button>
+
+</header>
+
+
+<!-- NOVA ANOTAÇÃO -->
+
+<div class="card-nova">
+
+  <textarea
+    id="textoAnotacao"
+    placeholder="Digite sua anotação do dia..."
+  ></textarea>
+
+  <div class="acoes">
+    <button id="btnSalvarAnotacao" class="btn-salvar" type="button">
+      Salvar anotação
+    </button>
+  </div>
+
+</div>
+
+
+<!-- LISTA -->
+
+<div class="section-title">
+  Anotações registradas
+</div>
+
+<div id="listaAnotacoes" class="lista-anotacoes">
+  <div class="vazio">Carregando anotações...</div>
+</div>
+
+</div>
+
+
+<!-- ==============================
+     SUPABASE
+=============================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="anotacoes.js"></script>
+
+</body>
+
+</html>

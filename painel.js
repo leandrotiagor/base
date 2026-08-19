@@ -148,6 +148,16 @@ if (modulo.nome === 'Controle de Viagens') {
     });
 }
 
+// Anotações
+if (modulo.nome === 'Anotações') {
+
+    card.style.cursor = 'pointer';
+
+    card.addEventListener('click', () => {
+        window.location.href = 'anotacoes.html';
+    });
+}
+
 modulosContainer.appendChild(card);
 
         });
