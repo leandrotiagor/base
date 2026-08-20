@@ -157,6 +157,41 @@
             color: #6b7280;
         }
 
+        .btn-detalhes {
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .btn-detalhes:hover {
+            background: #e0e7ff;
+        }
+
+        .sem-detalhes {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        #conteudoDetalhesAcesso .linha-detalhe {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        #conteudoDetalhesAcesso .linha-detalhe span:first-child {
+            color: #6b7280;
+        }
+
+        #conteudoDetalhesAcesso .linha-detalhe span:last-child {
+            font-weight: bold;
+            text-align: right;
+        }
+
         @media (max-width: 700px) {
 
             header {
@@ -258,12 +293,13 @@
                             <th>Operador</th>
                             <th>Tipo</th>
                             <th>Descrição</th>
+                            <th>Acessos (login)</th>
                         </tr>
                     </thead>
 
                     <tbody id="listaAuditoria">
                         <tr>
-                            <td colspan="4" class="mensagem">
+                            <td colspan="5" class="mensagem">
                                 Carregando registros...
                             </td>
                         </tr>
@@ -272,6 +308,39 @@
                 </table>
 
             </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         MODAL DETALHES DE ACESSO
+    =============================== -->
+
+    <div
+        id="modalDetalhesAcesso"
+        class="modal-overlay"
+        style="display: none;"
+    >
+
+        <div class="modal-caixa">
+
+            <div class="modal-cabecalho">
+
+                <h2>🔎 Detalhes do acesso</h2>
+
+                <button
+                    class="fechar-modal"
+                    type="button"
+                    onclick="fecharDetalhesAcesso()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div id="conteudoDetalhesAcesso"></div>
 
         </div>
 

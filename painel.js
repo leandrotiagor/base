@@ -138,43 +138,23 @@ card.innerHTML = `
     </div>
 `;
 
-// Controle de Viagens
-if (modulo.nome === 'Controle de Viagens') {
+// Mapa de módulos para suas respectivas páginas
+const PAGINAS_MODULOS = {
+    'Produtos': 'produtos.html',
+    'Estoque': 'estoque.html',
+    'Vendas': 'vendas.html',
+    'Caixa': 'caixa.html',
+    'Impressão': 'impressao.html',
+    'Administração': 'admin.html',
+    'Auditoria': 'auditoria.html'
+};
+
+if (PAGINAS_MODULOS[modulo.nome]) {
 
     card.style.cursor = 'pointer';
 
     card.addEventListener('click', () => {
-        window.location.href = 'viagens.html';
-    });
-}
-
-// Anotações
-if (modulo.nome === 'Anotações') {
-
-    card.style.cursor = 'pointer';
-
-    card.addEventListener('click', () => {
-        window.location.href = 'anotacoes.html';
-    });
-}
-
-// Cadastro de Usuários (agora é um módulo, não mais botão fixo)
-if (modulo.nome === 'Cadastro de Usuários') {
-
-    card.style.cursor = 'pointer';
-
-    card.addEventListener('click', () => {
-        window.location.href = 'admin.html';
-    });
-}
-
-// Auditoria (agora é um módulo, não mais botão fixo)
-if (modulo.nome === 'Auditoria') {
-
-    card.style.cursor = 'pointer';
-
-    card.addEventListener('click', () => {
-        window.location.href = 'auditoria.html';
+        window.location.href = PAGINAS_MODULOS[modulo.nome];
     });
 }
 

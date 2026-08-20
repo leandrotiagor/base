@@ -122,7 +122,7 @@ async function carregarAuditoria() {
 
     listaAuditoria.innerHTML = `
         <tr>
-            <td colspan="4" class="mensagem">
+            <td colspan="5" class="mensagem">
                 Carregando registros...
             </td>
         </tr>
@@ -132,7 +132,7 @@ async function carregarAuditoria() {
 
         let consulta = supabaseClient
             .from('auditoria')
-            .select('id, operador_id, operador_nome, tipo, descricao, created_at')
+            .select('id, operador_id, operador_nome, tipo, descricao, created_at, ip, cidade, regiao, pais, provedor, dispositivo')
             .order('created_at', { ascending: false })
             .limit(500);
 
@@ -168,7 +168,7 @@ async function carregarAuditoria() {
 
             listaAuditoria.innerHTML = `
                 <tr>
-                    <td colspan="4" class="mensagem">
+                    <td colspan="5" class="mensagem">
                         Nenhum registro encontrado para os filtros selecionados.
                     </td>
                 </tr>
@@ -189,11 +189,31 @@ async function carregarAuditoria() {
                 <td>${formatarData(registro.created_at)}</td>
                 <td>${registro.operador_nome || '—'}</td>
                 <td><span class="tag ${tag.classe}">${tag.texto}</span></td>
-                <td></td>
+                <td class="celula-descricao"></td>
+                <td class="celula-detalhes"></td>
             `;
 
             // Descrição via textContent para evitar HTML indevido
-            linha.children[3].textContent = registro.descricao || '';
+            linha.querySelector('.celula-descricao').textContent = registro.descricao || '';
+
+            const celulaDetalhes = linha.querySelector('.celula-detalhes');
+
+            if (registro.tipo === 'login') {
+
+                const botao = document.createElement('button');
+
+                botao.type = 'button';
+                botao.className = 'btn-detalhes';
+                botao.textContent = 'Detalhes';
+
+                botao.addEventListener('click', () => abrirDetalhesAcesso(registro));
+
+                celulaDetalhes.appendChild(botao);
+
+            } else {
+
+                celulaDetalhes.innerHTML = '<span class="sem-detalhes">—</span>';
+            }
 
             listaAuditoria.appendChild(linha);
         });
@@ -204,7 +224,7 @@ async function carregarAuditoria() {
 
         listaAuditoria.innerHTML = `
             <tr>
-                <td colspan="4" class="mensagem">
+                <td colspan="5" class="mensagem">
                     Erro ao carregar os registros de auditoria.
                 </td>
             </tr>
@@ -214,6 +234,55 @@ async function carregarAuditoria() {
 
 
 btnFiltrar.addEventListener('click', carregarAuditoria);
+
+
+// =====================================================
+// MODAL DE DETALHES DO ACESSO
+// =====================================================
+
+function abrirDetalhesAcesso(registro) {
+
+    const modal = document.getElementById('modalDetalhesAcesso');
+    const conteudo = document.getElementById('conteudoDetalhesAcesso');
+
+    const localizacao = [registro.cidade, registro.regiao, registro.pais]
+        .filter(Boolean)
+        .join(' - ');
+
+    const campos = [
+        ['Operador', registro.operador_nome || '—'],
+        ['Data / Hora', formatarData(registro.created_at)],
+        ['Endereço IP', registro.ip || 'Não capturado'],
+        ['Localização', localizacao || 'Não capturada'],
+        ['Provedor (ISP)', registro.provedor || 'Não capturado'],
+        ['Dispositivo', registro.dispositivo || 'Não capturado']
+    ];
+
+    conteudo.innerHTML = '';
+
+    campos.forEach(([rotulo, valor]) => {
+
+        const linha = document.createElement('div');
+        linha.className = 'linha-detalhe';
+
+        const spanRotulo = document.createElement('span');
+        spanRotulo.textContent = rotulo;
+
+        const spanValor = document.createElement('span');
+        spanValor.textContent = valor;
+
+        linha.appendChild(spanRotulo);
+        linha.appendChild(spanValor);
+
+        conteudo.appendChild(linha);
+    });
+
+    modal.style.display = 'flex';
+}
+
+function fecharDetalhesAcesso() {
+    document.getElementById('modalDetalhesAcesso').style.display = 'none';
+}
 
 
 // =====================================================

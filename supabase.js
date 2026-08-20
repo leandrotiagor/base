@@ -61,14 +61,36 @@ async function registrarAuditoria(tipo, descricao) {
             // Se não conseguir o nome, segue sem ele
         }
 
+        const registro = {
+            operador_id: user.id,
+            operador_nome: nomeOperador,
+            tipo: tipo,
+            descricao: descricao,
+            dispositivo: detectarDispositivo()
+        };
+
+        // Em logins, também captura IP, localização e provedor
+        if (tipo === 'login') {
+
+            try {
+
+                const respostaIp = await fetch('https://ipapi.co/json/');
+                const dadosIp = await respostaIp.json();
+
+                registro.ip = dadosIp?.ip || null;
+                registro.cidade = dadosIp?.city || null;
+                registro.regiao = dadosIp?.region || null;
+                registro.pais = dadosIp?.country_name || null;
+                registro.provedor = dadosIp?.org || null;
+
+            } catch (erroIp) {
+                console.error('Erro ao obter dados de IP:', erroIp);
+            }
+        }
+
         await supabaseClient
             .from('auditoria')
-            .insert({
-                operador_id: user.id,
-                operador_nome: nomeOperador,
-                tipo: tipo,
-                descricao: descricao
-            });
+            .insert(registro);
 
     } catch (erro) {
 
@@ -77,4 +99,31 @@ async function registrarAuditoria(tipo, descricao) {
             erro
         );
     }
+}
+
+
+// =====================================================
+// DETECÇÃO BÁSICA DE DISPOSITIVO (SO + NAVEGADOR)
+// =====================================================
+
+function detectarDispositivo() {
+
+    const ua = navigator.userAgent;
+
+    let sistema = 'Desconhecido';
+
+    if (/Windows/i.test(ua)) sistema = 'Windows';
+    else if (/Android/i.test(ua)) sistema = 'Android';
+    else if (/iPhone|iPad|iPod/i.test(ua)) sistema = 'iOS';
+    else if (/Mac OS/i.test(ua)) sistema = 'macOS';
+    else if (/Linux/i.test(ua)) sistema = 'Linux';
+
+    let navegador = 'Desconhecido';
+
+    if (/Edg\//i.test(ua)) navegador = 'Edge';
+    else if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua)) navegador = 'Chrome';
+    else if (/Firefox\//i.test(ua)) navegador = 'Firefox';
+    else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) navegador = 'Safari';
+
+    return `${sistema} · ${navegador}`;
 }

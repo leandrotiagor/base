@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtos - Leandro Sistemas</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<style>
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+    .btn-novo { background: #168c8c; color: #fff; font-weight: bold; }
+    .btn-categorias { background: #111827; color: #fff; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .filtros {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+        align-items: end;
+    }
+
+    .filtros label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .filtros input, .filtros select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .acoes-topo {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .tabela-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    th { font-size: 13px; color: #6b7280; }
+
+    .tag {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .tag-ok { background: #e4efe6; color: #2f6f4e; }
+    .tag-baixo { background: #fde8e8; color: #b42318; }
+    .tag-inativo { background: #f3f4f6; color: #6b7280; }
+
+    .btn-acao {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 6px 10px;
+        font-size: 12px;
+        margin-right: 6px;
+    }
+
+    .btn-acao-excluir {
+        background: #fde8e8;
+        color: #b42318;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .mensagem { padding: 20px; text-align: center; color: #6b7280; }
+
+    /* MODAL */
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 1000;
+    }
+
+    .modal-caixa {
+        background: #fff;
+        width: 100%;
+        max-width: 480px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 14px;
+        padding: 25px;
+    }
+
+    .modal-cabecalho {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-cabecalho h2 { margin: 0; font-size: 20px; }
+
+    .fechar-modal {
+        background: transparent;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #777;
+        line-height: 1;
+    }
+
+    form label {
+        display: block;
+        margin-top: 14px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+    }
+
+    form input, form select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .linha-dupla {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .modal-acoes {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .btn-cancelar { background: #e5e7eb; color: #111827; }
+    .btn-salvar { background: #168c8c; color: #fff; font-weight: bold; }
+
+    .lista-categorias {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .item-categoria {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .linha-dupla { grid-template-columns: 1fr; }
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>📦 Produtos</h1>
+
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
+
+</header>
+
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="acoes-topo">
+
+            <button class="btn-novo" id="btnNovoProduto" type="button">
+                + Novo produto
+            </button>
+
+            <button class="btn-categorias" id="btnCategorias" type="button">
+                🏷️ Categorias
+            </button>
+
+        </div>
+
+        <div class="filtros">
+
+            <div>
+                <label for="filtroBusca">Buscar por nome</label>
+                <input type="text" id="filtroBusca" placeholder="Digite o nome do produto">
+            </div>
+
+            <div>
+                <label for="filtroCategoria">Categoria</label>
+                <select id="filtroCategoria">
+                    <option value="">Todas</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="filtroEstoqueBaixo">Estoque</label>
+                <select id="filtroEstoqueBaixo">
+                    <option value="">Todos</option>
+                    <option value="baixo">Somente estoque baixo</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="tabela-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Preço custo</th>
+                        <th>Preço venda</th>
+                        <th>Estoque</th>
+                        <th>Estoque mínimo</th>
+                        <th>Situação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody id="listaProdutos">
+                    <tr><td colspan="8" class="mensagem">Carregando produtos...</td></tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL NOVO/EDITAR PRODUTO -->
+
+<div id="modalProduto" class="modal-overlay">
+
+    <div class="modal-caixa">
+
+        <div class="modal-cabecalho">
+            <h2 id="tituloModalProduto">Novo produto</h2>
+            <button class="fechar-modal" type="button" onclick="fecharModalProduto()">×</button>
+        </div>
+
+        <form id="formProduto">
+
+            <input type="hidden" id="produtoId">
+
+            <label for="produtoNome">Nome do produto</label>
+            <input type="text" id="produtoNome" required>
+
+            <label for="produtoCategoria">Categoria</label>
+            <select id="produtoCategoria">
+                <option value="">Sem categoria</option>
+            </select>
+
+            <div class="linha-dupla">
+
+                <div>
+                    <label for="produtoPrecoCusto">Preço de custo (R$)</label>
+                    <input type="number" id="produtoPrecoCusto" step="0.01" min="0" required>
+                </div>
+
+                <div>
+                    <label for="produtoPrecoVenda">Preço de venda (R$)</label>
+                    <input type="number" id="produtoPrecoVenda" step="0.01" min="0" required>
+                </div>
+
+            </div>
+
+            <div class="linha-dupla">
+
+                <div>
+                    <label for="produtoEstoque">Estoque atual</label>
+                    <input type="number" id="produtoEstoque" step="0.01" min="0" required>
+                </div>
+
+                <div>
+                    <label for="produtoEstoqueMinimo">Estoque mínimo</label>
+                    <input type="number" id="produtoEstoqueMinimo" step="0.01" min="0" required>
+                </div>
+
+            </div>
+
+            <label for="produtoAtivo">Situação</label>
+            <select id="produtoAtivo">
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+            </select>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModalProduto()">Cancelar</button>
+                <button type="submit" class="btn-salvar">Salvar produto</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL CATEGORIAS -->
+
+<div id="modalCategorias" class="modal-overlay">
+
+    <div class="modal-caixa">
+
+        <div class="modal-cabecalho">
+            <h2>🏷️ Categorias</h2>
+            <button class="fechar-modal" type="button" onclick="fecharModalCategorias()">×</button>
+        </div>
+
+        <form id="formNovaCategoria">
+            <label for="nomeNovaCategoria">Nova categoria</label>
+            <input type="text" id="nomeNovaCategoria" placeholder="Ex: Bebidas" required>
+
+            <div class="modal-acoes">
+                <button type="submit" class="btn-salvar">Adicionar categoria</button>
+            </div>
+        </form>
+
+        <div id="listaCategorias" class="lista-categorias">
+            Carregando categorias...
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="produtos.js"></script>
+
+<script>
+    document.getElementById('btnVoltar').addEventListener('click', function () {
+        window.location.href = 'painel.html';
+    });
+</script>
+
+</body>
+
+</html>
