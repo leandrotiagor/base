@@ -1,62 +1,307 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💰 Caixa - Leandro Sistemas</title>
+<title>Caixa - Leandro Sistemas</title>
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    min-height: 100vh;
-  }
-  header {
-    background: #ffffff;
-    padding: 20px 30px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header h1 { margin: 0; font-size: 24px; }
-  button {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    background: #e5e7eb;
-    color: #111827;
-  }
-  .aviso {
-    max-width: 600px;
-    margin: 60px auto;
-    background: #fff;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  .aviso h2 { margin-bottom: 10px; }
-  .aviso p { color: #6b7280; }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 18px; }
+
+    form label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 6px;
+        margin-top: 14px;
+    }
+
+    form input, form select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .btn-primario {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+        margin-top: 20px;
+        width: 100%;
+        padding: 13px;
+    }
+
+    .btn-fechar {
+        background: #dc2626;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .info-caixa {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 10px;
+    }
+
+    .info-item {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+
+    .info-item .rotulo {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .info-item .valor {
+        font-size: 20px;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .saldo-destaque .valor { color: #168c8c; }
+
+    .linha-dupla {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+    }
+
+    th { font-size: 12px; color: #6b7280; }
+
+    .tag {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .tag-entrada { background: #e4efe6; color: #2f6f4e; }
+    .tag-saida { background: #fde8e8; color: #b42318; }
+    .tag-venda { background: #e5eefc; color: #1d4ed8; }
+
+    .mensagem { padding: 20px; text-align: center; color: #6b7280; }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .linha-dupla { grid-template-columns: 1fr; }
+    }
+
 </style>
+
 </head>
+
 <body>
 
 <header>
     <h1>💰 Caixa</h1>
-    <button id="btnVoltar" type="button">← Voltar</button>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
 </header>
 
-<div class="aviso">
-    <h2>🚧 Módulo em construção</h2>
-    <p>Este módulo está sendo implementado e estará disponível em breve.</p>
+
+<div class="container">
+
+    <!-- CAIXA FECHADO: FORMULÁRIO DE ABERTURA -->
+    <div id="blocoAbrirCaixa" class="card" style="display:none;">
+
+        <h2>Abrir caixa</h2>
+
+        <form id="formAbrirCaixa">
+
+            <label for="valorAbertura">Valor de abertura (R$)</label>
+            <input type="number" id="valorAbertura" step="0.01" min="0" value="0" required>
+
+            <button type="submit" class="btn-primario">Abrir caixa</button>
+
+        </form>
+
+    </div>
+
+
+    <!-- CAIXA ABERTO -->
+    <div id="blocoCaixaAberto" style="display:none;">
+
+        <div class="card">
+
+            <h2>Caixa aberto</h2>
+
+            <div class="info-caixa">
+
+                <div class="info-item">
+                    <div class="rotulo">Aberto por</div>
+                    <div class="valor" id="infoOperador">—</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="rotulo">Aberto em</div>
+                    <div class="valor" id="infoAbertoEm">—</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="rotulo">Valor de abertura</div>
+                    <div class="valor" id="infoValorAbertura">—</div>
+                </div>
+
+                <div class="info-item saldo-destaque">
+                    <div class="rotulo">Saldo em dinheiro (esperado)</div>
+                    <div class="valor" id="infoSaldoEsperado">—</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Registrar movimentação manual</h2>
+
+            <form id="formMovimentacaoCaixa">
+
+                <div class="linha-dupla">
+
+                    <div>
+                        <label for="movCaixaTipo">Tipo</label>
+                        <select id="movCaixaTipo" required>
+                            <option value="entrada">Entrada (reforço de caixa)</option>
+                            <option value="saida">Saída (sangria/retirada)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="movCaixaValor">Valor (R$)</label>
+                        <input type="number" id="movCaixaValor" step="0.01" min="0.01" required>
+                    </div>
+
+                </div>
+
+                <label for="movCaixaDescricao">Descrição</label>
+                <input type="text" id="movCaixaDescricao" placeholder="Ex: Troco inicial, retirada para banco...">
+
+                <button type="submit" class="btn-primario">Registrar movimentação</button>
+
+            </form>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Movimentações da sessão atual</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="listaMovimentacoesCaixa">
+                    <tr><td colspan="4" class="mensagem">Carregando...</td></tr>
+                </tbody>
+            </table>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Fechar caixa</h2>
+
+            <form id="formFecharCaixa">
+
+                <label for="valorContado">Valor contado fisicamente (R$)</label>
+                <input type="number" id="valorContado" step="0.01" min="0" required>
+
+                <button type="submit" class="btn-fechar" style="width:100%; margin-top:20px; padding:13px;">
+                    Fechar caixa
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="caixa.js"></script>
 
 <script>
     document.getElementById('btnVoltar').addEventListener('click', function () {
@@ -65,4 +310,5 @@
 </script>
 
 </body>
+
 </html>

@@ -1,62 +1,346 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🛒 Vendas - Leandro Sistemas</title>
+<title>Vendas - Leandro Sistemas</title>
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    min-height: 100vh;
-  }
-  header {
-    background: #ffffff;
-    padding: 20px 30px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header h1 { margin: 0; font-size: 24px; }
-  button {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    background: #e5e7eb;
-    color: #111827;
-  }
-  .aviso {
-    max-width: 600px;
-    margin: 60px auto;
-    background: #fff;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  .aviso h2 { margin-bottom: 10px; }
-  .aviso p { color: #6b7280; }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 18px; }
+
+    .aviso-caixa {
+        max-width: 600px;
+        margin: 60px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .aviso-caixa h2 { margin-bottom: 10px; }
+    .aviso-caixa p { color: #6b7280; margin-bottom: 20px; }
+
+    .btn-primario {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    form label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 6px;
+        margin-top: 14px;
+    }
+
+    form input, form select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .linha-produto {
+        display: grid;
+        grid-template-columns: 2fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+
+    th { font-size: 12px; color: #6b7280; }
+
+    td input[type="number"] {
+        width: 80px;
+        padding: 6px 8px;
+    }
+
+    .btn-remover {
+        background: #fde8e8;
+        color: #b42318;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .resumo {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 16px;
+    }
+
+    .resumo-caixa {
+        width: 280px;
+    }
+
+    .resumo-linha {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        font-size: 14px;
+    }
+
+    .resumo-linha.total {
+        font-size: 20px;
+        font-weight: bold;
+        color: #168c8c;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 10px;
+        margin-top: 6px;
+    }
+
+    .formas-pagamento {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .forma-btn {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .forma-btn.selecionada {
+        background: #111827;
+        color: #fff;
+    }
+
+    .bloco-dinheiro {
+        margin-top: 16px;
+        display: none;
+    }
+
+    .bloco-dinheiro.visivel { display: block; }
+
+    #trocoCalculado {
+        margin-top: 10px;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .btn-finalizar {
+        width: 100%;
+        padding: 15px;
+        margin-top: 22px;
+        font-size: 16px;
+    }
+
+    .vendas-hoje-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 13px;
+    }
+
+    .mensagem { padding: 16px; text-align: center; color: #6b7280; }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .linha-produto { grid-template-columns: 1fr; }
+        .formas-pagamento { grid-template-columns: repeat(2, 1fr); }
+    }
+
 </style>
+
 </head>
+
 <body>
 
 <header>
     <h1>🛒 Vendas</h1>
-    <button id="btnVoltar" type="button">← Voltar</button>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
 </header>
 
-<div class="aviso">
-    <h2>🚧 Módulo em construção</h2>
-    <p>Este módulo está sendo implementado e estará disponível em breve.</p>
+
+<!-- AVISO: CAIXA FECHADO -->
+<div id="avisoCaixaFechado" class="aviso-caixa" style="display:none;">
+    <h2>🔒 Caixa fechado</h2>
+    <p>É necessário abrir o caixa antes de registrar uma venda.</p>
+    <button class="btn-primario" onclick="window.location.href='caixa.html'">Ir para o Caixa</button>
 </div>
+
+
+<!-- TELA DE VENDAS -->
+<div id="conteudoVendas" class="container" style="display:none;">
+
+    <div class="card">
+
+        <h2>Nova venda</h2>
+
+        <div class="linha-produto">
+
+            <div>
+                <label for="listaProdutosDatalist">Produto</label>
+                <input list="listaProdutosDatalist" id="inputProduto" placeholder="Digite o nome do produto">
+                <datalist id="listaProdutosDatalist"></datalist>
+            </div>
+
+            <div>
+                <label for="inputQuantidade">Quantidade</label>
+                <input type="number" id="inputQuantidade" min="1" step="1" value="1">
+            </div>
+
+            <div>
+                <button type="button" id="btnAdicionarCarrinho" class="btn-primario" style="height:44px;">
+                    + Adicionar
+                </button>
+            </div>
+
+        </div>
+
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Preço unit.</th>
+                    <th>Qtd</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="listaCarrinho">
+                <tr><td colspan="5" class="mensagem">Carrinho vazio</td></tr>
+            </tbody>
+        </table>
+
+
+        <label for="clienteNome">Cliente (opcional)</label>
+        <input type="text" id="clienteNome" placeholder="Nome do cliente">
+
+        <label for="descontoValor">Desconto (R$)</label>
+        <input type="number" id="descontoValor" step="0.01" min="0" value="0">
+
+
+        <div class="resumo">
+            <div class="resumo-caixa">
+                <div class="resumo-linha">
+                    <span>Subtotal</span>
+                    <span id="resumoSubtotal">R$ 0,00</span>
+                </div>
+                <div class="resumo-linha">
+                    <span>Desconto</span>
+                    <span id="resumoDesconto">R$ 0,00</span>
+                </div>
+                <div class="resumo-linha total">
+                    <span>Total</span>
+                    <span id="resumoTotal">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+
+        <label>Forma de pagamento</label>
+
+        <div class="formas-pagamento">
+            <button type="button" class="forma-btn" data-forma="dinheiro">Dinheiro</button>
+            <button type="button" class="forma-btn" data-forma="pix">PIX</button>
+            <button type="button" class="forma-btn" data-forma="debito">Débito</button>
+            <button type="button" class="forma-btn" data-forma="credito">Crédito</button>
+        </div>
+
+        <div id="blocoDinheiro" class="bloco-dinheiro">
+
+            <label for="valorRecebido">Valor recebido (R$)</label>
+            <input type="number" id="valorRecebido" step="0.01" min="0">
+
+            <div id="trocoCalculado"></div>
+
+        </div>
+
+
+        <button type="button" id="btnFinalizarVenda" class="btn-primario btn-finalizar">
+            Finalizar venda
+        </button>
+
+    </div>
+
+
+    <div class="card">
+        <h2>Vendas de hoje</h2>
+        <div id="listaVendasHoje">
+            <p class="mensagem">Carregando...</p>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="vendas.js"></script>
 
 <script>
     document.getElementById('btnVoltar').addEventListener('click', function () {
@@ -65,4 +349,5 @@
 </script>
 
 </body>
+
 </html>
