@@ -1,62 +1,375 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📊 Estoque - Leandro Sistemas</title>
+<title>Estoque - Leandro Sistemas</title>
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    min-height: 100vh;
-  }
-  header {
-    background: #ffffff;
-    padding: 20px 30px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header h1 { margin: 0; font-size: 24px; }
-  button {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    background: #e5e7eb;
-    color: #111827;
-  }
-  .aviso {
-    max-width: 600px;
-    margin: 60px auto;
-    background: #fff;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  .aviso h2 { margin-bottom: 10px; }
-  .aviso p { color: #6b7280; }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .alerta-estoque {
+        background: #fff4ec;
+        border: 1px solid #f4c9a3;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 20px;
+    }
+
+    .alerta-estoque h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: #a8402a;
+    }
+
+    .alerta-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f4dfc7;
+        font-size: 14px;
+    }
+
+    .alerta-item:last-child { border-bottom: none; }
+
+    .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .tab-btn.ativo {
+        background: #111827;
+        color: #fff;
+    }
+
+    .aba { display: none; }
+    .aba.ativa { display: block; }
+
+    .filtros {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+        align-items: end;
+    }
+
+    .filtros label, form label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .filtros input, .filtros select,
+    form input, form select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    form label { margin-top: 14px; }
+
+    .linha-dupla {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .btn-salvar {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .tabela-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+    }
+
+    th { font-size: 13px; color: #6b7280; }
+
+    .tag {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .tag-entrada { background: #e4efe6; color: #2f6f4e; }
+    .tag-saida { background: #fde8e8; color: #b42318; }
+    .tag-ajuste { background: #e5eefc; color: #1d4ed8; }
+
+    .mensagem { padding: 20px; text-align: center; color: #6b7280; }
+
+    .inventario-linha {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+
+    .inventario-linha input {
+        padding: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        width: 100%;
+    }
+
+    .inventario-cabecalho {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 10px;
+        font-size: 12px;
+        color: #6b7280;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
+        font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .linha-dupla { grid-template-columns: 1fr; }
+        .inventario-linha, .inventario-cabecalho { grid-template-columns: 1fr 1fr; }
+    }
+
 </style>
+
 </head>
+
 <body>
 
 <header>
     <h1>📊 Estoque</h1>
-    <button id="btnVoltar" type="button">← Voltar</button>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
 </header>
 
-<div class="aviso">
-    <h2>🚧 Módulo em construção</h2>
-    <p>Este módulo está sendo implementado e estará disponível em breve.</p>
+
+<div class="container">
+
+    <!-- ALERTAS DE ESTOQUE BAIXO -->
+    <div id="alertaEstoque" class="alerta-estoque" style="display:none;">
+        <h3>⚠️ Produtos com estoque baixo</h3>
+        <div id="listaAlertaEstoque"></div>
+    </div>
+
+    <div class="card">
+
+        <div class="tabs">
+            <button class="tab-btn ativo" data-aba="movimentacao" type="button">Movimentação</button>
+            <button class="tab-btn" data-aba="historico" type="button">Histórico</button>
+            <button class="tab-btn" data-aba="inventario" type="button">Inventário</button>
+        </div>
+
+
+        <!-- ABA MOVIMENTAÇÃO -->
+        <div id="aba-movimentacao" class="aba ativa">
+
+            <form id="formMovimentacao">
+
+                <label for="movProduto">Produto</label>
+                <select id="movProduto" required>
+                    <option value="">Selecione um produto</option>
+                </select>
+
+                <div class="linha-dupla">
+
+                    <div>
+                        <label for="movTipo">Tipo de movimentação</label>
+                        <select id="movTipo" required>
+                            <option value="entrada">Entrada</option>
+                            <option value="saida">Saída</option>
+                            <option value="ajuste">Ajuste (definir novo estoque)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label id="labelQuantidadeMov" for="movQuantidade">Quantidade</label>
+                        <input type="number" id="movQuantidade" step="0.01" min="0" required>
+                    </div>
+
+                </div>
+
+                <label for="movMotivo">Motivo / observação</label>
+                <input type="text" id="movMotivo" placeholder="Ex: Compra de fornecedor, quebra, etc.">
+
+                <button type="submit" class="btn-salvar">Registrar movimentação</button>
+
+            </form>
+
+        </div>
+
+
+        <!-- ABA HISTÓRICO -->
+        <div id="aba-historico" class="aba">
+
+            <div class="filtros">
+
+                <div>
+                    <label for="filtroHistProduto">Produto</label>
+                    <select id="filtroHistProduto">
+                        <option value="">Todos os produtos</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filtroHistTipo">Tipo</label>
+                    <select id="filtroHistTipo">
+                        <option value="">Todos</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                        <option value="ajuste">Ajuste</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filtroHistInicio">De</label>
+                    <input type="date" id="filtroHistInicio">
+                </div>
+
+                <div>
+                    <label for="filtroHistFim">Até</label>
+                    <input type="date" id="filtroHistFim">
+                </div>
+
+                <div>
+                    <button id="btnFiltrarHistorico" type="button" style="width:100%; background:#111827; color:#fff;">
+                        🔍 Filtrar
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="tabela-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Tipo</th>
+                            <th>Quantidade</th>
+                            <th>Motivo</th>
+                            <th>Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaHistorico">
+                        <tr><td colspan="6" class="mensagem">Carregando histórico...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+
+        <!-- ABA INVENTÁRIO -->
+        <div id="aba-inventario" class="aba">
+
+            <p style="color:#6b7280; font-size:13px; margin-bottom:16px;">
+                Informe a quantidade contada fisicamente para os produtos que precisam de ajuste.
+                Produtos sem alteração podem ficar em branco.
+            </p>
+
+            <div class="inventario-cabecalho">
+                <span>Produto</span>
+                <span>Estoque atual</span>
+                <span>Contagem física</span>
+                <span>Diferença</span>
+            </div>
+
+            <div id="listaInventario">
+                Carregando produtos...
+            </div>
+
+            <button id="btnAplicarInventario" type="button" class="btn-salvar">
+                Aplicar ajustes do inventário
+            </button>
+
+        </div>
+
+    </div>
+
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="estoque.js"></script>
 
 <script>
     document.getElementById('btnVoltar').addEventListener('click', function () {
@@ -65,4 +378,5 @@
 </script>
 
 </body>
+
 </html>
