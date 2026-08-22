@@ -221,6 +221,7 @@ document.getElementById('formMovimentacaoCaixa').addEventListener('submit', asyn
         );
 
         document.getElementById('formMovimentacaoCaixa').reset();
+        rastreadorMovCaixa.marcarLimpo();
 
         await renderizarTela();
 
@@ -364,6 +365,7 @@ document.getElementById('formFecharCaixa').addEventListener('submit', async (eve
         alert(mensagem);
 
         document.getElementById('formFecharCaixa').reset();
+        rastreadorFecharCaixa.marcarLimpo();
 
         await renderizarTela();
 
@@ -392,3 +394,15 @@ document.getElementById('formFecharCaixa').addEventListener('submit', async (eve
     await renderizarTela();
 
 })();
+
+
+// =====================================================
+// AVISO ANTES DE SAIR COM FORMULÁRIO NÃO SALVO
+// =====================================================
+
+const rastreadorMovCaixa = rastrearFormularioSujo('formMovimentacaoCaixa');
+const rastreadorFecharCaixa = rastrearFormularioSujo('formFecharCaixa');
+
+avisarAntesDeSair(() =>
+    rastreadorMovCaixa.estaSujo() || rastreadorFecharCaixa.estaSujo()
+);

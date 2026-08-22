@@ -177,10 +177,14 @@ const btnFecharModal = document.getElementById('btnFecharModal');
 const btnCancelarOperador = document.getElementById('btnCancelarOperador');
 const formOperador = document.getElementById('formOperador');
 
+const rastreadorFormOperador = rastrearFormularioSujo('formOperador');
+avisarAntesDeSair(() => rastreadorFormOperador.estaSujo());
+
 
 btnNovoOperador.addEventListener('click', () => {
 
     modalOperador.style.display = 'flex';
+    rastreadorFormOperador.marcarLimpo();
 
 });
 
@@ -190,6 +194,8 @@ function fecharModalOperador() {
     modalOperador.style.display = 'none';
 
     formOperador.reset();
+
+    rastreadorFormOperador.marcarLimpo();
 
 }
 

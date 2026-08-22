@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - LT Sistemas</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<style>
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button, select {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .filtro-periodo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filtro-periodo select {
+        border: 1px solid #d1d5db;
+        background: #fff;
+    }
+
+    .cards-resumo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .card-resumo {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .card-resumo .rotulo {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 6px;
+    }
+
+    .card-resumo .valor {
+        font-size: 24px;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .card-resumo.lucro .valor { color: #168c8c; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 18px; }
+
+    .grafico-wrap {
+        position: relative;
+        height: 320px;
+    }
+
+    .mensagem { padding: 20px; text-align: center; color: #6b7280; }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .grafico-wrap { height: 260px; }
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>📉 Dashboard</h1>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
+</header>
+
+
+<div class="container">
+
+    <div class="filtro-periodo">
+        <label for="filtroPeriodo" style="font-size:13px; font-weight:bold; color:#374151;">Período:</label>
+        <select id="filtroPeriodo">
+            <option value="7">Últimos 7 dias</option>
+            <option value="14" selected>Últimos 14 dias</option>
+            <option value="30">Últimos 30 dias</option>
+        </select>
+    </div>
+
+
+    <div class="cards-resumo">
+
+        <div class="card-resumo">
+            <div class="rotulo">Faturamento no período</div>
+            <div class="valor" id="cardFaturamento">R$ 0,00</div>
+        </div>
+
+        <div class="card-resumo lucro">
+            <div class="rotulo">Lucro estimado</div>
+            <div class="valor" id="cardLucro">R$ 0,00</div>
+        </div>
+
+        <div class="card-resumo">
+            <div class="rotulo">Número de vendas</div>
+            <div class="valor" id="cardNumeroVendas">0</div>
+        </div>
+
+        <div class="card-resumo">
+            <div class="rotulo">Ticket médio</div>
+            <div class="valor" id="cardTicketMedio">R$ 0,00</div>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+        <h2>Vendas por dia</h2>
+        <div class="grafico-wrap">
+            <canvas id="graficoVendasPorDia"></canvas>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <h2>Produtos mais vendidos</h2>
+        <div class="grafico-wrap">
+            <canvas id="graficoMaisVendidos"></canvas>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="supabase.js"></script>
+<script src="dashboard.js"></script>
+
+<script>
+    document.getElementById('btnVoltar').addEventListener('click', function () {
+        window.location.href = 'painel.html';
+    });
+</script>
+
+</body>
+
+</html>

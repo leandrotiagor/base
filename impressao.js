@@ -27,6 +27,21 @@ function rotuloFormaPagamento(forma) {
 
 
 // =====================================================
+// PREFERÊNCIA DE LARGURA DO PAPEL (BOBINA TÉRMICA)
+// =====================================================
+
+const CHAVE_PAPEL_TERMICO = 'lt_sistemas_largura_papel_termico';
+
+function obterLarguraPapelTermico() {
+    return localStorage.getItem(CHAVE_PAPEL_TERMICO) || '80';
+}
+
+function definirLarguraPapelTermico(largura) {
+    localStorage.setItem(CHAVE_PAPEL_TERMICO, largura);
+}
+
+
+// =====================================================
 // ABRE UMA JANELA DE IMPRESSÃO COM O CONTEÚDO PRONTO
 // =====================================================
 
@@ -39,8 +54,16 @@ function abrirJanelaImpressao(titulo, conteudoHtml, largaEstreita) {
         return;
     }
 
-    const larguraCss = largaEstreita === 'estreita' ? '320px' : '100%';
-    const fonteCss = largaEstreita === 'estreita' ? "'Courier New', monospace" : 'Arial, sans-serif';
+    const larguraPapelMm = obterLarguraPapelTermico();
+
+    const usaTermica = largaEstreita === 'estreita';
+
+    const larguraCss = usaTermica ? `${larguraPapelMm}mm` : '100%';
+    const fonteCss = usaTermica ? "'Courier New', monospace" : 'Arial, sans-serif';
+
+    const regraPagina = usaTermica
+        ? `@page { size: ${larguraPapelMm}mm auto; margin: 2mm; }`
+        : `@page { margin: 12mm; }`;
 
     janela.document.write(`
         <!DOCTYPE html>
@@ -49,16 +72,18 @@ function abrirJanelaImpressao(titulo, conteudoHtml, largaEstreita) {
             <meta charset="UTF-8">
             <title>${titulo}</title>
             <style>
+                ${regraPagina}
                 * { box-sizing: border-box; }
                 body {
                     font-family: ${fonteCss};
+                    width: ${larguraCss};
                     max-width: ${larguraCss};
                     margin: 0 auto;
-                    padding: 16px;
+                    padding: ${usaTermica ? '2mm' : '16px'};
                     color: #111;
-                    font-size: 13px;
+                    font-size: ${usaTermica ? '11px' : '13px'};
                 }
-                h1 { font-size: 16px; margin: 0 0 4px; text-align: center; }
+                h1 { font-size: ${usaTermica ? '13px' : '16px'}; margin: 0 0 4px; text-align: center; }
                 h2 { font-size: 13px; margin: 16px 0 6px; }
                 .subtitulo { text-align: center; color: #555; font-size: 11px; margin-bottom: 14px; }
                 hr { border: none; border-top: 1px dashed #999; margin: 10px 0; }
@@ -77,7 +102,7 @@ function abrirJanelaImpressao(titulo, conteudoHtml, largaEstreita) {
                 .linha-item { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; }
                 .rodape { margin-top: 20px; text-align: center; font-size: 11px; color: #666; }
                 @media print {
-                    body { padding: 0; }
+                    body { padding: ${usaTermica ? '0' : '0'}; }
                 }
             </style>
         </head>
@@ -431,3 +456,16 @@ document.getElementById('btnRelatorioEstoque').addEventListener('click', async (
     await carregarCaixasImpressao();
 
 })();
+
+
+// =====================================================
+// SELETOR DE LARGURA DA BOBINA TÉRMICA
+// =====================================================
+
+const seletorLarguraPapel = document.getElementById('seletorLarguraPapel');
+
+seletorLarguraPapel.value = obterLarguraPapelTermico();
+
+seletorLarguraPapel.addEventListener('change', () => {
+    definirLarguraPapelTermico(seletorLarguraPapel.value);
+});

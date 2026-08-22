@@ -533,3 +533,10 @@ async function carregarVendasHoje() {
     await carregarVendasHoje();
 
 })();
+
+
+// =====================================================
+// AVISO ANTES DE SAIR COM CARRINHO EM ABERTO
+// =====================================================
+
+avisarAntesDeSair(() => carrinho.length > 0);

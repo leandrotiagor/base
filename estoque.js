@@ -247,6 +247,7 @@ document.getElementById('formMovimentacao').addEventListener('submit', async (ev
         alert('Movimentação registrada com sucesso!');
 
         document.getElementById('formMovimentacao').reset();
+        rastreadorFormMovimentacao.marcarLimpo();
 
         await carregarProdutos();
 
@@ -501,3 +502,11 @@ document.getElementById('btnAplicarInventario').addEventListener('click', async 
     await carregarProdutos();
 
 })();
+
+
+// =====================================================
+// AVISO ANTES DE SAIR COM MOVIMENTAÇÃO NÃO SALVA
+// =====================================================
+
+const rastreadorFormMovimentacao = rastrearFormularioSujo('formMovimentacao');
+avisarAntesDeSair(() => rastreadorFormMovimentacao.estaSujo());

@@ -146,7 +146,8 @@ const PAGINAS_MODULOS = {
     'Caixa': 'caixa.html',
     'Impressão': 'impressao.html',
     'Administração': 'admin.html',
-    'Auditoria': 'auditoria.html'
+    'Auditoria': 'auditoria.html',
+    'Dashboard': 'dashboard.html'
 };
 
 if (PAGINAS_MODULOS[modulo.nome]) {
@@ -189,6 +190,82 @@ btnSair.addEventListener('click', async () => {
 
 // Inicia o painel
 carregarPainel();
+
+
+// =====================================================
+// ALERTA DE ESTOQUE BAIXO (NOTIFICAÇÃO DO NAVEGADOR)
+// =====================================================
+
+async function verificarAlertasEstoqueBaixo() {
+
+    if (!('Notification' in window)) {
+        return;
+    }
+
+    if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+    }
+
+    if (Notification.permission !== 'granted') {
+        return;
+    }
+
+    const { data: produtos, error } = await supabaseClient
+        .from('produtos')
+        .select('id, nome, estoque, estoque_minimo')
+        .eq('ativo', true);
+
+    if (error || !produtos) {
+        return;
+    }
+
+    const baixos = produtos.filter(
+        p => Number(p.estoque) <= Number(p.estoque_minimo)
+    );
+
+    if (baixos.length === 0) {
+        return;
+    }
+
+    const hoje = new Date().toISOString().slice(0, 10);
+    const chave = `estoque_notificado_${hoje}`;
+
+    let jaNotificados = [];
+
+    try {
+        jaNotificados = JSON.parse(localStorage.getItem(chave) || '[]');
+    } catch (e) {
+        jaNotificados = [];
+    }
+
+    const novos = baixos.filter(p => !jaNotificados.includes(p.id));
+
+    if (novos.length === 0) {
+        return;
+    }
+
+    if (novos.length === 1) {
+
+        new Notification('⚠️ Estoque baixo', {
+            body: `${novos[0].nome} está com estoque baixo (${novos[0].estoque} un.)`,
+            icon: 'icon-192.png'
+        });
+
+    } else {
+
+        new Notification('⚠️ Estoque baixo', {
+            body: `${novos.length} produtos estão com estoque baixo.`,
+            icon: 'icon-192.png'
+        });
+    }
+
+    localStorage.setItem(
+        chave,
+        JSON.stringify([...jaNotificados, ...novos.map(p => p.id)])
+    );
+}
+
+verificarAlertasEstoqueBaixo();
 
 
 // =====================================================

@@ -293,14 +293,19 @@ function abrirModalProduto(produto) {
     }
 
     modalProduto.style.display = 'flex';
+    rastreadorFormProduto.marcarLimpo();
 }
 
 function fecharModalProduto() {
     modalProduto.style.display = 'none';
     formProduto.reset();
+    rastreadorFormProduto.marcarLimpo();
 }
 
 document.getElementById('btnNovoProduto').addEventListener('click', () => abrirModalProduto(null));
+
+const rastreadorFormProduto = rastrearFormularioSujo('formProduto');
+avisarAntesDeSair(() => rastreadorFormProduto.estaSujo());
 
 
 formProduto.addEventListener('submit', async (event) => {
