@@ -1,3 +1,5 @@
+let usuarioAdminAtualId = null;
+
 async function verificarAdministrador() {
 
     const {
@@ -28,6 +30,8 @@ async function verificarAdministrador() {
         window.location.href = 'painel.html';
         return null;
     }
+
+    usuarioAdminAtualId = user.id;
 
     return user;
 }
@@ -112,6 +116,19 @@ async function carregarOperadores() {
     )">
     🔑 Resetar senha
 </button>
+
+${
+    operador.id !== usuarioAdminAtualId
+        ? `<button
+            class="btn-excluir-operador"
+            onclick="excluirOperador(
+                '${operador.id}',
+                '${operador.nome.replace(/'/g, "\\'")}'
+            )">
+            🗑️ Excluir
+        </button>`
+        : ''
+}
 
 </td>
             `;
@@ -1123,6 +1140,85 @@ async function resetarSenhaOperador(
         alert(
             erro.message ||
             'Erro ao redefinir senha.'
+        );
+    }
+}
+
+
+// =====================================================
+// EXCLUIR OPERADOR (APAGA TUDO RELACIONADO A ELE)
+// =====================================================
+
+async function excluirOperador(operadorId, nomeOperador) {
+
+    const primeiraConfirmacao = confirm(
+        `Tem certeza que deseja EXCLUIR o operador "${nomeOperador}"?\n\n` +
+        `Isso vai apagar PERMANENTEMENTE tudo relacionado a ele: vendas, ` +
+        `movimentações de estoque, caixas abertos por ele e seu histórico de auditoria.\n\n` +
+        `Essa ação não pode ser desfeita.`
+    );
+
+    if (!primeiraConfirmacao) {
+        return;
+    }
+
+    const segundaConfirmacao = prompt(
+        `Para confirmar, digite o nome "${nomeOperador}" exatamente como está:`
+    );
+
+    if (segundaConfirmacao !== nomeOperador) {
+        alert('Nome não confere. Exclusão cancelada.');
+        return;
+    }
+
+    try {
+
+        const {
+            data: resposta,
+            error
+        } = await supabaseClient.functions.invoke(
+            'excluir-operador',
+            {
+                body: { id: operadorId }
+            }
+        );
+
+        if (error) {
+
+            let mensagem = 'Não foi possível excluir o operador.';
+
+            try {
+                if (error.context) {
+                    const corpo = await error.context.json();
+                    if (corpo?.erro) {
+                        mensagem = corpo.erro;
+                    }
+                }
+            } catch (e) {}
+
+            throw new Error(mensagem);
+        }
+
+        if (resposta?.erro) {
+            throw new Error(resposta.erro);
+        }
+
+        await registrarAuditoria(
+            'acao',
+            `Excluiu o operador "${nomeOperador}" e todos os dados relacionados a ele.`
+        );
+
+        alert('Operador excluído com sucesso.');
+
+        await carregarOperadores();
+
+    } catch (erro) {
+
+        console.error('Erro ao excluir operador:', erro);
+
+        alert(
+            erro.message ||
+            'Erro ao excluir operador.'
         );
     }
 }
