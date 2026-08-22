@@ -190,7 +190,7 @@ async function imprimirComprovante(vendaId) {
     });
 
     const conteudo = `
-        <h1>Leandro Sistemas</h1>
+        <h1>LT Sistemas</h1>
         <div class="subtitulo">Comprovante de Venda</div>
         <hr>
         <div class="linha-item"><span>Data</span><span>${formatarDataHora(venda.created_at)}</span></div>
@@ -271,7 +271,7 @@ document.getElementById('btnRelatorioDia').addEventListener('click', async () =>
     });
 
     const conteudo = `
-        <h1>Leandro Sistemas</h1>
+        <h1>LT Sistemas</h1>
         <div class="subtitulo">Relatório do Dia - ${hoje.toLocaleDateString('pt-BR')}</div>
         <hr>
         <h2>Vendas do dia (${vendas.length})</h2>
@@ -344,7 +344,7 @@ async function carregarCaixasImpressao() {
 function imprimirFechamentoCaixa(caixa) {
 
     const conteudo = `
-        <h1>Leandro Sistemas</h1>
+        <h1>LT Sistemas</h1>
         <div class="subtitulo">Fechamento de Caixa</div>
         <hr>
         <div class="linha-item"><span>Operador</span><span>${caixa.operador_nome || '—'}</span></div>
@@ -398,7 +398,7 @@ document.getElementById('btnRelatorioEstoque').addEventListener('click', async (
     });
 
     const conteudo = `
-        <h1>Leandro Sistemas</h1>
+        <h1>LT Sistemas</h1>
         <div class="subtitulo">Relatório de Estoque - ${new Date().toLocaleDateString('pt-BR')}</div>
         <hr>
         <table>
