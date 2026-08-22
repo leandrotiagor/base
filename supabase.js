@@ -70,21 +70,17 @@ async function registrarAuditoria(tipo, descricao) {
         };
 
         // Em logins, também captura IP, localização e provedor
+        // (tenta um serviço; se falhar, tenta um segundo como reserva)
         if (tipo === 'login') {
 
-            try {
+            const dadosIp = await buscarDadosDeIp();
 
-                const respostaIp = await fetch('https://ipapi.co/json/');
-                const dadosIp = await respostaIp.json();
-
-                registro.ip = dadosIp?.ip || null;
-                registro.cidade = dadosIp?.city || null;
-                registro.regiao = dadosIp?.region || null;
-                registro.pais = dadosIp?.country_name || null;
-                registro.provedor = dadosIp?.org || null;
-
-            } catch (erroIp) {
-                console.error('Erro ao obter dados de IP:', erroIp);
+            if (dadosIp) {
+                registro.ip = dadosIp.ip || null;
+                registro.cidade = dadosIp.cidade || null;
+                registro.regiao = dadosIp.regiao || null;
+                registro.pais = dadosIp.pais || null;
+                registro.provedor = dadosIp.provedor || null;
             }
         }
 
@@ -126,4 +122,61 @@ function detectarDispositivo() {
     else if (/Safari\//i.test(ua) && !/Chrome/i.test(ua)) navegador = 'Safari';
 
     return `${sistema} · ${navegador}`;
+}
+
+
+// =====================================================
+// BUSCA IP / LOCALIZAÇÃO / PROVEDOR (COM RESERVA)
+// =====================================================
+// Tenta o ipapi.co primeiro; se falhar (bloqueio de rede,
+// rastreador bloqueado pelo navegador, etc.), tenta o
+// geojs.io como alternativa antes de desistir.
+// =====================================================
+
+async function buscarDadosDeIp() {
+
+    // Tentativa 1: ipapi.co
+    try {
+
+        const resposta = await fetch('https://ipapi.co/json/');
+        const dados = await resposta.json();
+
+        if (dados && dados.ip && !dados.error) {
+
+            return {
+                ip: dados.ip,
+                cidade: dados.city,
+                regiao: dados.region,
+                pais: dados.country_name,
+                provedor: dados.org
+            };
+        }
+
+    } catch (erro) {
+        console.error('Falha no ipapi.co:', erro);
+    }
+
+    // Tentativa 2 (reserva): geojs.io
+    try {
+
+        const resposta = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        const dados = await resposta.json();
+
+        if (dados && dados.ip) {
+
+            return {
+                ip: dados.ip,
+                cidade: dados.city,
+                regiao: dados.region,
+                pais: dados.country,
+                provedor: dados.organization_name || dados.asn || null
+            };
+        }
+
+    } catch (erro) {
+        console.error('Falha no geojs.io:', erro);
+    }
+
+    // Nenhum dos dois funcionou
+    return null;
 }
