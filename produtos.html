@@ -147,20 +147,21 @@
         inset: 0;
         background: rgba(0,0,0,0.45);
         display: none;
-        align-items: center;
         justify-content: center;
+        align-items: flex-start;
         padding: 20px;
         z-index: 1000;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .modal-caixa {
         background: #fff;
         width: 100%;
         max-width: 480px;
-        max-height: 90vh;
-        overflow-y: auto;
         border-radius: 14px;
         padding: 25px;
+        margin: 20px 0 40px;
     }
 
     .modal-cabecalho {

@@ -201,8 +201,7 @@ async function buscarDadosDeIp() {
 
 // =====================================================
 // AVISO ANTES DE SAIR SEM SALVAR
-// =====================================================
-// Funções reutilizáveis em qualquer página para evitar que
+// =====================================================// Funções reutilizáveis em qualquer página para evitar que
 // o usuário perca dados preenchidos ao sair sem querer.
 // =====================================================
 
@@ -241,4 +240,21 @@ function rastrearFormularioSujo(idFormulario) {
         estaSujo: () => sujo,
         marcarLimpo: () => { sujo = false; }
     };
+}
+
+
+// =====================================================
+// TRAVAR/LIBERAR ROLAGEM DE FUNDO (MODAIS NO CELULAR)
+// =====================================================
+// No Safari/iOS, deixar o fundo da página rolando junto
+// com um modal aberto pode "travar" a rolagem do próprio
+// modal. Chamar ao abrir/fechar qualquer modal resolve isso.
+// =====================================================
+
+function travarRolagemFundo() {
+    document.body.style.overflow = 'hidden';
+}
+
+function liberarRolagemFundo() {
+    document.body.style.overflow = '';
 }

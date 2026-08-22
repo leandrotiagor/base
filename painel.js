@@ -282,11 +282,13 @@ const btnCancelarTrocarSenha = document.getElementById('btnCancelarTrocarSenha')
 function abrirModalTrocarSenha() {
     formTrocarSenha.reset();
     modalTrocarSenha.style.display = 'flex';
+    travarRolagemFundo();
 }
 
 function fecharModalTrocarSenha() {
     modalTrocarSenha.style.display = 'none';
     formTrocarSenha.reset();
+    liberarRolagemFundo();
 }
 
 btnTrocarSenha.addEventListener('click', abrirModalTrocarSenha);

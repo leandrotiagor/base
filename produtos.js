@@ -141,10 +141,12 @@ formNovaCategoria.addEventListener('submit', async (event) => {
 
 document.getElementById('btnCategorias').addEventListener('click', () => {
     modalCategorias.style.display = 'flex';
+    travarRolagemFundo();
 });
 
 function fecharModalCategorias() {
     modalCategorias.style.display = 'none';
+    liberarRolagemFundo();
 }
 
 
@@ -294,12 +296,14 @@ function abrirModalProduto(produto) {
 
     modalProduto.style.display = 'flex';
     rastreadorFormProduto.marcarLimpo();
+    travarRolagemFundo();
 }
 
 function fecharModalProduto() {
     modalProduto.style.display = 'none';
     formProduto.reset();
     rastreadorFormProduto.marcarLimpo();
+    liberarRolagemFundo();
 }
 
 document.getElementById('btnNovoProduto').addEventListener('click', () => abrirModalProduto(null));

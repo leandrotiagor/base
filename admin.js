@@ -185,6 +185,7 @@ btnNovoOperador.addEventListener('click', () => {
 
     modalOperador.style.display = 'flex';
     rastreadorFormOperador.marcarLimpo();
+    travarRolagemFundo();
 
 });
 
@@ -196,6 +197,8 @@ function fecharModalOperador() {
     formOperador.reset();
 
     rastreadorFormOperador.marcarLimpo();
+
+    liberarRolagemFundo();
 
 }
 
@@ -366,6 +369,8 @@ function abrirPermissoesPerfil() {
         'modalPermissoesPerfil'
     ).style.display = 'flex';
 
+    travarRolagemFundo();
+
     const seletor = document.getElementById('seletorPerfilPermissao');
 
     seletor.innerHTML = PERFIS_DISPONIVEIS.map(
@@ -383,6 +388,8 @@ function fecharPermissoesPerfil() {
     document.getElementById(
         'modalPermissoesPerfil'
     ).style.display = 'none';
+
+    liberarRolagemFundo();
 
     perfilPermissaoAtual = null;
 }
@@ -867,6 +874,8 @@ async function abrirEdicaoOperador(operadorId) {
             'modalEditarOperador'
         ).style.display = 'flex';
 
+        travarRolagemFundo();
+
     } catch (erro) {
 
         console.error(
@@ -886,6 +895,8 @@ function fecharEdicaoOperador() {
     document.getElementById(
         'modalEditarOperador'
     ).style.display = 'none';
+
+    liberarRolagemFundo();
 
     operadorEdicaoAtual = null;
 }
