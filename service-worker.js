@@ -1,53 +1,20 @@
 // =====================================================
 // SERVICE WORKER - LT SISTEMAS
 // =====================================================
-// Faz o app funcionar melhor offline/instalado:
-// guarda uma cópia local das páginas e scripts, e serve
-// essa cópia enquanto atualiza em segundo plano.
+// Faz o app funcionar melhor offline/instalado. Estratégia:
+// SEMPRE tenta buscar a versão mais nova na internet primeiro;
+// só usa a cópia salva (cache) se a internet estiver fora do ar.
+// Isso evita mostrar telas antigas/desatualizadas por engano.
 // =====================================================
 
-const CACHE_NAME = 'lt-sistemas-v1';
-
-const ARQUIVOS_PARA_CACHE = [
-    './',
-    './index.html',
-    './painel.html',
-    './produtos.html',
-    './estoque.html',
-    './vendas.html',
-    './caixa.html',
-    './impressao.html',
-    './admin.html',
-    './auditoria.html',
-    './dashboard.html',
-    './style.css',
-    './supabase.js',
-    './login.js',
-    './painel.js',
-    './produtos.js',
-    './estoque.js',
-    './vendas.js',
-    './caixa.js',
-    './impressao.js',
-    './admin.js',
-    './auditoria.js',
-    './dashboard.js',
-    './manifest.json',
-    './icon-192.png',
-    './icon-512.png'
-];
+const CACHE_NAME = 'lt-sistemas-v2';
 
 
 self.addEventListener('install', (event) => {
-
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ARQUIVOS_PARA_CACHE).catch((erro) => {
-                console.error('Erro ao preencher cache inicial:', erro);
-            });
-        })
-    );
-
+    // Não pré-carrega uma lista fixa de arquivos (se um arquivo
+    // novo ainda não existir no servidor, isso quebraria a
+    // instalação inteira). O cache é preenchido aos poucos,
+    // conforme as páginas são visitadas normalmente.
     self.skipWaiting();
 });
 
@@ -80,20 +47,15 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        caches.match(event.request).then((respostaCache) => {
+        fetch(event.request)
+            .then((respostaRede) => {
 
-            const buscaNaRede = fetch(event.request)
-                .then((respostaRede) => {
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, respostaRede.clone());
+                });
 
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, respostaRede.clone());
-                    });
-
-                    return respostaRede;
-                })
-                .catch(() => respostaCache);
-
-            return respostaCache || buscaNaRede;
-        })
+                return respostaRede;
+            })
+            .catch(() => caches.match(event.request))
     );
 });
