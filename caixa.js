@@ -34,7 +34,7 @@ async function carregarOperadorAtual() {
 
 
 // =====================================================
-// VERIFICA SE EXISTE CAIXA ABERTO (GLOBAL)
+// VERIFICA SE EXISTE CAIXA ABERTO (POR OPERADOR)
 // =====================================================
 
 async function verificarCaixaAberto() {
@@ -43,6 +43,7 @@ async function verificarCaixaAberto() {
         .from('caixa')
         .select('*')
         .eq('status', 'aberto')
+        .eq('operador_id', usuarioAtual.id)
         .order('aberto_em', { ascending: false })
         .limit(1)
         .maybeSingle();

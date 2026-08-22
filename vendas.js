@@ -54,6 +54,7 @@ async function verificarCaixaAberto() {
         .from('caixa')
         .select('*')
         .eq('status', 'aberto')
+        .eq('operador_id', usuarioAtual.id)
         .order('aberto_em', { ascending: false })
         .limit(1)
         .maybeSingle();
