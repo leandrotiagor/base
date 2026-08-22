@@ -61,12 +61,12 @@ async function carregarPainel() {
             `Olá, ${operador.nome}`;
 
 
-        // Busca os módulos permitidos
+        // Busca os módulos permitidos para o PERFIL do operador
         const {
             data: permissoes,
             error: permissoesError
         } = await supabaseClient
-            .from('permissoes')
+            .from('permissoes_perfil')
             .select(`
                 modulo_id,
                 modulos (
@@ -77,7 +77,7 @@ async function carregarPainel() {
                     ativo
                 )
             `)
-            .eq('operador_id', operador.id);
+            .eq('perfil', operador.perfil);
 
 
         if (permissoesError) {
