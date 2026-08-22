@@ -744,6 +744,261 @@ document.getElementById('seletorPerfilPermissao')
     });
 
 
+// =====================================================
+// ABAS (OPERADORES / HISTÓRICO DE VENDAS)
+// =====================================================
+
+document.querySelectorAll('.tab-admin-btn').forEach(botao => {
+
+    botao.addEventListener('click', () => {
+
+        document.querySelectorAll('.tab-admin-btn').forEach(b => b.classList.remove('ativo'));
+        document.querySelectorAll('.aba-admin').forEach(a => a.classList.remove('ativa'));
+
+        botao.classList.add('ativo');
+        document.getElementById(`aba-admin-${botao.dataset.aba}`).classList.add('ativa');
+
+        if (botao.dataset.aba === 'vendas') {
+            carregarFiltroOperadoresVendas();
+            carregarVendasAdmin();
+        }
+    });
+});
+
+
+// =====================================================
+// HISTÓRICO DE VENDAS
+// =====================================================
+
+function formatarMoedaAdmin(valor) {
+    return Number(valor || 0).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
+
+function formatarDataAdmin(dataISO) {
+    return new Date(dataISO).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function rotuloFormaPagamentoAdmin(forma) {
+    const mapa = { dinheiro: 'Dinheiro', pix: 'PIX', debito: 'Débito', credito: 'Crédito' };
+    return mapa[forma] || forma || '—';
+}
+
+
+async function carregarFiltroOperadoresVendas() {
+
+    const select = document.getElementById('filtroVendaOperador');
+
+    if (select.dataset.carregado) return;
+
+    const { data, error } = await supabaseClient
+        .from('operadores')
+        .select('id, nome')
+        .order('nome');
+
+    if (error) {
+        console.error('Erro ao carregar operadores para filtro:', error);
+        return;
+    }
+
+    (data || []).forEach(op => {
+        const option = document.createElement('option');
+        option.value = op.id;
+        option.textContent = op.nome;
+        select.appendChild(option);
+    });
+
+    select.dataset.carregado = 'true';
+}
+
+
+async function carregarVendasAdmin() {
+
+    const lista = document.getElementById('listaVendasAdmin');
+
+    lista.innerHTML = '<tr><td colspan="7" class="mensagem">Carregando vendas...</td></tr>';
+
+    try {
+
+        let consulta = supabaseClient
+            .from('vendas')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(500);
+
+        const operador = document.getElementById('filtroVendaOperador').value;
+        const status = document.getElementById('filtroVendaStatus').value;
+        const inicio = document.getElementById('filtroVendaInicio').value;
+        const fim = document.getElementById('filtroVendaFim').value;
+
+        if (operador) consulta = consulta.eq('operador_id', operador);
+        if (status) consulta = consulta.eq('status', status);
+        if (inicio) consulta = consulta.gte('created_at', `${inicio}T00:00:00`);
+        if (fim) consulta = consulta.lte('created_at', `${fim}T23:59:59`);
+
+        const { data, error } = await consulta;
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            lista.innerHTML = '<tr><td colspan="7" class="mensagem">Nenhuma venda encontrada.</td></tr>';
+            return;
+        }
+
+        lista.innerHTML = '';
+
+        data.forEach(venda => {
+
+            const linha = document.createElement('tr');
+
+            const tagStatus = venda.status === 'cancelada'
+                ? '<span style="background:#fde8e8;color:#b42318;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:bold;">Cancelada</span>'
+                : '<span style="background:#e4efe6;color:#2f6f4e;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:bold;">Concluída</span>';
+
+            linha.innerHTML = `
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>${tagStatus}</td>
+                <td></td>
+            `;
+
+            linha.children[0].textContent = formatarDataAdmin(venda.created_at);
+            linha.children[1].textContent = venda.operador_nome || '—';
+            linha.children[2].textContent = venda.cliente_nome || '—';
+            linha.children[3].textContent = formatarMoedaAdmin(venda.total);
+            linha.children[4].textContent = rotuloFormaPagamentoAdmin(venda.forma_pagamento);
+
+            const celulaAcoes = linha.children[6];
+
+            if (venda.status !== 'cancelada') {
+
+                const botao = document.createElement('button');
+                botao.type = 'button';
+                botao.textContent = 'Cancelar venda';
+                botao.style.cssText = 'background:#fde8e8;color:#b42318;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;';
+
+                botao.addEventListener('click', () => cancelarVenda(venda));
+
+                celulaAcoes.appendChild(botao);
+
+            } else {
+
+                celulaAcoes.innerHTML = '<span style="color:#9ca3af;font-size:12px;">—</span>';
+            }
+
+            lista.appendChild(linha);
+        });
+
+    } catch (erro) {
+
+        console.error('Erro ao carregar vendas:', erro);
+        lista.innerHTML = '<tr><td colspan="7" class="mensagem">Erro ao carregar vendas.</td></tr>';
+    }
+}
+
+document.getElementById('btnFiltrarVendas').addEventListener('click', carregarVendasAdmin);
+
+
+async function cancelarVenda(venda) {
+
+    if (!confirm(
+        `Cancelar a venda de ${formatarMoedaAdmin(venda.total)} (${venda.cliente_nome || 'cliente não informado'})?\n\n` +
+        `O estoque dos produtos será devolvido e o valor será estornado do caixa.`
+    )) {
+        return;
+    }
+
+    try {
+
+        // 1. Busca os itens da venda para devolver ao estoque
+        const { data: itens, error: erroItens } = await supabaseClient
+            .from('venda_itens')
+            .select('*')
+            .eq('venda_id', venda.id);
+
+        if (erroItens) throw erroItens;
+
+        // 2. Devolve o estoque de cada item
+        for (const item of (itens || [])) {
+
+            const { data: produto } = await supabaseClient
+                .from('produtos')
+                .select('estoque')
+                .eq('id', item.produto_id)
+                .single();
+
+            if (produto) {
+
+                const novoEstoque = Number(produto.estoque) + Number(item.quantidade);
+
+                await supabaseClient
+                    .from('produtos')
+                    .update({ estoque: novoEstoque })
+                    .eq('id', item.produto_id);
+
+                await supabaseClient
+                    .from('estoque_movimentacoes')
+                    .insert({
+                        produto_id: item.produto_id,
+                        tipo: 'entrada',
+                        quantidade: item.quantidade,
+                        motivo: `Estorno - cancelamento da venda #${venda.id.slice(0, 8)}`,
+                        operador_nome: null
+                    });
+            }
+        }
+
+        // 3. Estorna o valor no caixa (se a venda estava vinculada a um caixa)
+        if (venda.caixa_id) {
+
+            await supabaseClient
+                .from('caixa_movimentacoes')
+                .insert({
+                    caixa_id: venda.caixa_id,
+                    tipo: 'venda',
+                    valor: -Number(venda.total),
+                    forma_pagamento: venda.forma_pagamento,
+                    descricao: `Estorno - cancelamento da venda #${venda.id.slice(0, 8)}`,
+                    venda_id: venda.id
+                });
+        }
+
+        // 4. Marca a venda como cancelada
+        const { error: erroUpdate } = await supabaseClient
+            .from('vendas')
+            .update({ status: 'cancelada' })
+            .eq('id', venda.id);
+
+        if (erroUpdate) throw erroUpdate;
+
+        await registrarAuditoria(
+            'acao',
+            `Cancelou a venda #${venda.id.slice(0, 8)} no valor de ${formatarMoedaAdmin(venda.total)}.`
+        );
+
+        alert('Venda cancelada com sucesso. Estoque e caixa foram ajustados.');
+
+        await carregarVendasAdmin();
+
+    } catch (erro) {
+
+        console.error('Erro ao cancelar venda:', erro);
+        alert('Não foi possível cancelar a venda.');
+    }
+}
+
+
 // Inicializa a página administrativa
 iniciarAdministracao();
 let operadorEdicaoAtual = null;

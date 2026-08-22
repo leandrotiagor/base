@@ -303,6 +303,31 @@
 
     <div class="container">
 
+        <div class="tabs-admin" style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+            <button class="tab-admin-btn ativo" data-aba="operadores" type="button">👤 Operadores</button>
+            <button class="tab-admin-btn" data-aba="vendas" type="button">🧾 Histórico de Vendas</button>
+        </div>
+
+        <style>
+            .tab-admin-btn {
+                background: #f3f4f6;
+                color: #374151;
+                border: none;
+                padding: 10px 18px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .tab-admin-btn.ativo { background: #111827; color: #fff; }
+            .aba-admin { display: none; }
+            .aba-admin.ativa { display: block; }
+        </style>
+
+
+        <!-- ABA OPERADORES -->
+        <div id="aba-admin-operadores" class="aba-admin ativa">
+
         <div class="topo">
 
             <h2>
@@ -370,6 +395,73 @@
             </table>
 
         </div>
+
+        </div>
+        <!-- FIM ABA OPERADORES -->
+
+
+        <!-- ABA HISTÓRICO DE VENDAS -->
+        <div id="aba-admin-vendas" class="aba-admin">
+
+            <div class="card">
+
+                <div class="filtros-vendas" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:20px; align-items:end;">
+
+                    <div>
+                        <label style="display:block; font-size:13px; font-weight:bold; color:#374151; margin-bottom:6px;">Operador</label>
+                        <select id="filtroVendaOperador" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display:block; font-size:13px; font-weight:bold; color:#374151; margin-bottom:6px;">Status</label>
+                        <select id="filtroVendaStatus" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+                            <option value="">Todos</option>
+                            <option value="concluida">Concluída</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display:block; font-size:13px; font-weight:bold; color:#374151; margin-bottom:6px;">De</label>
+                        <input type="date" id="filtroVendaInicio" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+                    </div>
+
+                    <div>
+                        <label style="display:block; font-size:13px; font-weight:bold; color:#374151; margin-bottom:6px;">Até</label>
+                        <input type="date" id="filtroVendaFim" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px;">
+                    </div>
+
+                    <div>
+                        <button id="btnFiltrarVendas" type="button" style="width:100%; background:#111827; color:#fff; border:none; padding:11px; border-radius:8px; cursor:pointer;">
+                            🔍 Filtrar
+                        </button>
+                    </div>
+
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Operador</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Pagamento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaVendasAdmin">
+                        <tr><td colspan="7" class="mensagem">Carregando vendas...</td></tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+        <!-- FIM ABA HISTÓRICO DE VENDAS -->
 
     </div>
 

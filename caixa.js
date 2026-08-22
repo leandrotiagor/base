@@ -286,8 +286,11 @@ async function carregarMovimentacoes() {
 
         linha.children[0].textContent = formatarDataHora(mov.created_at);
         linha.children[2].textContent = mov.descricao || '—';
+
+        const valorExibicao = mov.tipo === 'saida' ? -Math.abs(Number(mov.valor)) : Number(mov.valor);
+
         linha.children[3].textContent =
-            (mov.tipo === 'saida' ? '- ' : '+ ') + formatarMoeda(mov.valor);
+            (valorExibicao < 0 ? '- ' : '+ ') + formatarMoeda(Math.abs(valorExibicao));
 
         lista.appendChild(linha);
     });

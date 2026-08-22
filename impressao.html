@@ -1,62 +1,167 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🖨️ Impressão - Leandro Sistemas</title>
+<title>Impressão - Leandro Sistemas</title>
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    color: #1f2937;
-    min-height: 100vh;
-  }
-  header {
-    background: #ffffff;
-    padding: 20px 30px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header h1 { margin: 0; font-size: 24px; }
-  button {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    background: #e5e7eb;
-    color: #111827;
-  }
-  .aviso {
-    max-width: 600px;
-    margin: 60px auto;
-    background: #fff;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  .aviso h2 { margin-bottom: 10px; }
-  .aviso p { color: #6b7280; }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .card h2 { margin: 0 0 6px; font-size: 18px; }
+    .card .desc { color: #6b7280; font-size: 13px; margin-bottom: 16px; }
+
+    .btn-primario {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+        padding: 12px 20px;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+    }
+
+    th { font-size: 12px; color: #6b7280; }
+
+    .btn-imprimir-linha {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .mensagem { padding: 16px; text-align: center; color: #6b7280; }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+    }
+
 </style>
+
 </head>
+
 <body>
 
 <header>
     <h1>🖨️ Impressão</h1>
-    <button id="btnVoltar" type="button">← Voltar</button>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
 </header>
 
-<div class="aviso">
-    <h2>🚧 Módulo em construção</h2>
-    <p>Este módulo está sendo implementado e estará disponível em breve.</p>
+
+<div class="container">
+
+    <!-- COMPROVANTE DE VENDA -->
+    <div class="card">
+        <h2>🧾 Comprovante de venda</h2>
+        <div class="desc">Escolha uma venda recente para imprimir o comprovante.</div>
+
+        <table>
+            <thead>
+                <tr><th>Data</th><th>Cliente</th><th>Total</th><th>Pagamento</th><th></th></tr>
+            </thead>
+            <tbody id="listaVendasImpressao">
+                <tr><td colspan="5" class="mensagem">Carregando vendas...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- RELATÓRIO DO DIA -->
+    <div class="card">
+        <h2>📅 Relatório do dia</h2>
+        <div class="desc">Resumo de todas as vendas realizadas hoje, com total por forma de pagamento.</div>
+        <button class="btn-primario" id="btnRelatorioDia" type="button">Gerar relatório do dia</button>
+    </div>
+
+
+    <!-- FECHAMENTO DE CAIXA -->
+    <div class="card">
+        <h2>💰 Fechamento de caixa</h2>
+        <div class="desc">Escolha um caixa já fechado para imprimir o resumo do fechamento.</div>
+
+        <table>
+            <thead>
+                <tr><th>Aberto em</th><th>Fechado em</th><th>Operador</th><th>Diferença</th><th></th></tr>
+            </thead>
+            <tbody id="listaCaixasImpressao">
+                <tr><td colspan="5" class="mensagem">Carregando caixas...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- RELATÓRIO DE ESTOQUE -->
+    <div class="card">
+        <h2>📦 Relatório de estoque</h2>
+        <div class="desc">Lista completa dos produtos com estoque atual, mínimo e situação.</div>
+        <button class="btn-primario" id="btnRelatorioEstoque" type="button">Gerar relatório de estoque</button>
+    </div>
+
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="impressao.js"></script>
 
 <script>
     document.getElementById('btnVoltar').addEventListener('click', function () {
@@ -65,4 +170,5 @@
 </script>
 
 </body>
+
 </html>
