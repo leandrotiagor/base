@@ -167,7 +167,7 @@ formEscala.addEventListener('submit', async (evento) => {
     } catch (erro) {
 
         console.error('Erro ao salvar escala:', erro);
-        alert('Não foi possível salvar a escala.');
+        alert('Não foi possível salvar a escala.\n\nDetalhes: ' + (erro.message || JSON.stringify(erro)));
 
     } finally {
 
