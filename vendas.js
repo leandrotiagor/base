@@ -91,134 +91,7 @@ async function carregarProdutos() {
         option.value = produto.nome;
         datalist.appendChild(option);
     });
-
-    renderizarChipsCategorias();
-    renderizarGradeProdutos();
 }
-
-
-// =====================================================
-// GRADE RÁPIDA DE PRODUTOS
-// =====================================================
-
-let categoriaSelecionadaGrade = '';
-
-function renderizarChipsCategorias() {
-
-    const container = document.getElementById('chipsCategorias');
-
-    const categorias = [...new Set(
-        produtosCache.map(p => p.categoria).filter(Boolean)
-    )].sort();
-
-    container.innerHTML = '';
-
-    const chipTodas = document.createElement('button');
-    chipTodas.type = 'button';
-    chipTodas.className = 'chip-categoria' + (categoriaSelecionadaGrade === '' ? ' ativo' : '');
-    chipTodas.textContent = 'Todas';
-    chipTodas.addEventListener('click', () => {
-        categoriaSelecionadaGrade = '';
-        renderizarChipsCategorias();
-        renderizarGradeProdutos();
-    });
-    container.appendChild(chipTodas);
-
-    categorias.forEach(categoria => {
-
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'chip-categoria' + (categoriaSelecionadaGrade === categoria ? ' ativo' : '');
-        chip.textContent = categoria;
-        chip.addEventListener('click', () => {
-            categoriaSelecionadaGrade = categoria;
-            renderizarChipsCategorias();
-            renderizarGradeProdutos();
-        });
-
-        container.appendChild(chip);
-    });
-}
-
-
-function renderizarGradeProdutos() {
-
-    const grade = document.getElementById('gradeProdutos');
-    const busca = document.getElementById('buscaRapida').value.trim().toLowerCase();
-
-    let filtrados = produtosCache;
-
-    if (categoriaSelecionadaGrade) {
-        filtrados = filtrados.filter(p => p.categoria === categoriaSelecionadaGrade);
-    }
-
-    if (busca) {
-        filtrados = filtrados.filter(p => p.nome.toLowerCase().includes(busca));
-    }
-
-    if (filtrados.length === 0) {
-        grade.innerHTML = '<div class="mensagem" style="grid-column: 1/-1;">Nenhum produto encontrado.</div>';
-        return;
-    }
-
-    grade.innerHTML = '';
-
-    filtrados.forEach(produto => {
-
-        const semEstoque = Number(produto.estoque) <= 0;
-        const itemNoCarrinho = carrinho.find(i => i.produto.id === produto.id);
-
-        const tile = document.createElement('button');
-        tile.type = 'button';
-        tile.className = 'produto-tile' +
-            (semEstoque ? ' sem-estoque' : '') +
-            (itemNoCarrinho ? ' no-carrinho' : '');
-
-        tile.innerHTML = `
-            <div class="nome-tile"></div>
-            <div class="preco-tile"></div>
-            <div class="qtd-tile"></div>
-        `;
-
-        tile.querySelector('.nome-tile').textContent = produto.nome;
-        tile.querySelector('.preco-tile').textContent = formatarMoeda(produto.preco_venda);
-        tile.querySelector('.qtd-tile').textContent = itemNoCarrinho
-            ? `${itemNoCarrinho.quantidade} no carrinho`
-            : `Estoque: ${produto.estoque}`;
-
-        tile.addEventListener('click', () => adicionarProdutoAoCarrinho(produto, 1));
-
-        grade.appendChild(tile);
-    });
-}
-
-
-document.getElementById('buscaRapida').addEventListener('input', renderizarGradeProdutos);
-
-document.getElementById('buscaRapida').addEventListener('keydown', (evento) => {
-
-    if (evento.key !== 'Enter') {
-        return;
-    }
-
-    const valor = evento.target.value.trim();
-
-    if (!valor) {
-        return;
-    }
-
-    // Se o texto digitado bater com o nome exato de um produto
-    // (ex: leitor de código de barras), adiciona direto.
-    const produtoExato = produtosCache.find(
-        p => p.nome.toLowerCase() === valor.toLowerCase()
-    );
-
-    if (produtoExato) {
-        adicionarProdutoAoCarrinho(produtoExato, 1);
-        evento.target.value = '';
-        renderizarGradeProdutos();
-    }
-});
 
 
 // =====================================================
@@ -249,17 +122,6 @@ document.getElementById('btnAdicionarCarrinho').addEventListener('click', () => 
         return;
     }
 
-    adicionarProdutoAoCarrinho(produto, quantidade);
-
-    document.getElementById('inputProduto').value = '';
-    document.getElementById('inputQuantidade').value = 1;
-});
-
-
-// Adiciona um produto ao carrinho (usada pela grade rápida,
-// pelo botão manual e pelo atalho de Enter/código de barras).
-function adicionarProdutoAoCarrinho(produto, quantidade) {
-
     const itemExistente = carrinho.find(i => i.produto.id === produto.id);
 
     const quantidadeTotalNoCarrinho = (itemExistente?.quantidade || 0) + quantidade;
@@ -279,8 +141,11 @@ function adicionarProdutoAoCarrinho(produto, quantidade) {
         carrinho.push({ produto, quantidade });
     }
 
+    document.getElementById('inputProduto').value = '';
+    document.getElementById('inputQuantidade').value = 1;
+
     renderizarCarrinho();
-}
+});
 
 
 function renderizarCarrinho() {
@@ -290,7 +155,6 @@ function renderizarCarrinho() {
     if (carrinho.length === 0) {
         lista.innerHTML = '<tr><td colspan="5" class="mensagem">Carrinho vazio</td></tr>';
         atualizarResumo();
-        renderizarGradeProdutos();
         return;
     }
 
@@ -336,7 +200,6 @@ function renderizarCarrinho() {
     });
 
     atualizarResumo();
-    renderizarGradeProdutos();
 }
 
 

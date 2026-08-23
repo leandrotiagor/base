@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escala de Cultos - LT Sistemas</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<style>
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+    .btn-novo { background: #168c8c; color: #fff; font-weight: bold; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 18px; }
+
+    form label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 6px;
+        margin-top: 14px;
+    }
+
+    form input, form select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .linha-dupla {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .linha-tripla {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+    }
+
+    .btn-salvar {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+        margin-top: 20px;
+        width: 100%;
+        padding: 13px;
+    }
+
+    .aviso-publico {
+        background: #eef6f6;
+        border: 1px solid #cbe9e9;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 13px;
+        color: #0f5c5c;
+        margin-bottom: 20px;
+    }
+
+    .tabela-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    th { font-size: 13px; color: #6b7280; }
+
+    .btn-acao {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 6px 10px;
+        font-size: 12px;
+        margin-right: 6px;
+    }
+
+    .btn-acao-excluir {
+        background: #fde8e8;
+        color: #b42318;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .mensagem { padding: 20px; text-align: center; color: #6b7280; }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .linha-dupla, .linha-tripla { grid-template-columns: 1fr; }
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>📅 Escala de Cultos</h1>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
+</header>
+
+
+<div class="container">
+
+    <div class="aviso-publico">
+        ℹ️ Tudo que você cadastrar aqui aparece automaticamente na seção
+        "Escala da Semana" do site público da igreja.
+    </div>
+
+    <div class="card">
+
+        <h2 id="tituloForm">Nova escala</h2>
+
+        <form id="formEscala">
+
+            <input type="hidden" id="escalaId">
+
+            <div class="linha-tripla">
+
+                <div>
+                    <label for="escalaData">Data</label>
+                    <input type="date" id="escalaData" required>
+                </div>
+
+                <div>
+                    <label for="escalaDiaSemana">Dia da semana</label>
+                    <select id="escalaDiaSemana" required>
+                        <option value="Domingo">Domingo</option>
+                        <option value="Segunda">Segunda</option>
+                        <option value="Terça">Terça</option>
+                        <option value="Quarta">Quarta</option>
+                        <option value="Quinta">Quinta</option>
+                        <option value="Sexta">Sexta</option>
+                        <option value="Sábado">Sábado</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="escalaTurno">Turno</label>
+                    <select id="escalaTurno" required>
+                        <option value="Manhã">Manhã</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Noite">Noite</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <label for="escalaTipoCulto">Tipo de culto</label>
+            <input
+                list="listaTiposCulto"
+                id="escalaTipoCulto"
+                placeholder="Ex: Culto de Libertação, Mulheres de Fé, Jovens..."
+                required
+            >
+            <datalist id="listaTiposCulto">
+                <option value="Culto de Oração">
+                <option value="Mulheres de Fé">
+                <option value="Culto da Palavra">
+                <option value="Culto Evangelístico">
+                <option value="Culto de Libertação">
+                <option value="Departamentos">
+                <option value="Culto da Família">
+                <option value="Jovens">
+            </datalist>
+
+            <div class="linha-dupla">
+
+                <div>
+                    <label for="escalaAbertura">Abertura</label>
+                    <input type="text" id="escalaAbertura" placeholder="Nome de quem abre">
+                </div>
+
+                <div>
+                    <label for="escalaMensagem">Mensagem</label>
+                    <input type="text" id="escalaMensagem" placeholder="Nome de quem ministra">
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-salvar" id="btnSalvarEscala">Salvar escala</button>
+
+            <button
+                type="button"
+                id="btnCancelarEdicao"
+                style="display:none; width:100%; margin-top:10px; background:#e5e7eb; color:#111827;"
+            >
+                Cancelar edição
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Próximas escalas</h2>
+
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Dia</th>
+                        <th>Turno</th>
+                        <th>Tipo de culto</th>
+                        <th>Abertura</th>
+                        <th>Mensagem</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaEscalas">
+                    <tr><td colspan="7" class="mensagem">Carregando escalas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="escala-cultos.js"></script>
+
+<script>
+    document.getElementById('btnVoltar').addEventListener('click', function () {
+        window.location.href = 'painel.html';
+    });
+</script>
+
+</body>
+
+</html>

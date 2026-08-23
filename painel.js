@@ -147,7 +147,8 @@ const PAGINAS_MODULOS = {
     'Impressão': 'impressao.html',
     'Administração': 'admin.html',
     'Auditoria': 'auditoria.html',
-    'Dashboard': 'dashboard.html'
+    'Dashboard': 'dashboard.html',
+    'Escala de Cultos': 'escala-cultos.html'
 };
 
 if (PAGINAS_MODULOS[modulo.nome]) {
