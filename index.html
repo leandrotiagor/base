@@ -56,85 +56,165 @@
 
 <body>
 
-    <!-- ==============================
-         LOGIN
-    =============================== -->
+    <div class="login-split">
 
-    <div class="login-container">
+        <!-- ==============================
+             PAINEL VISUAL (TECNOLOGIA)
+        =============================== -->
 
-        <div class="login-card">
+        <div class="login-visual" aria-hidden="true">
 
-            <div class="logo">
+            <svg viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg" class="login-visual-svg">
 
-                <h1>
-                    LT SISTEMAS
-                </h1>
+                <defs>
+                    <radialGradient id="brilho" cx="30%" cy="25%" r="75%">
+                        <stop offset="0%" stop-color="#1c3a3a"/>
+                        <stop offset="100%" stop-color="#0b1520"/>
+                    </radialGradient>
+                    <linearGradient id="linhaTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#2ec4c4"/>
+                        <stop offset="100%" stop-color="#168c8c"/>
+                    </linearGradient>
+                </defs>
 
+                <rect width="800" height="1000" fill="url(#brilho)"/>
+
+                <!-- trilhas de circuito -->
+                <g stroke="#2a4d4d" stroke-width="2" fill="none" opacity="0.55">
+                    <path d="M60,120 H260 V260 H480 V180 H700"/>
+                    <path d="M40,420 H220 V520 H120 V680 H340"/>
+                    <path d="M480,560 H640 V420 H760"/>
+                    <path d="M120,820 H300 V920 H560 V800 H700"/>
+                    <path d="M560,120 V300 H700 V480"/>
+                </g>
+
+                <!-- linhas de rede conectando os nós -->
+                <g stroke="url(#linhaTeal)" stroke-width="2.5" opacity="0.8">
+                    <line x1="150" y1="180" x2="380" y2="300"/>
+                    <line x1="380" y1="300" x2="640" y2="220"/>
+                    <line x1="380" y1="300" x2="300" y2="520"/>
+                    <line x1="300" y1="520" x2="560" y2="600"/>
+                    <line x1="560" y1="600" x2="700" y2="480"/>
+                    <line x1="300" y1="520" x2="150" y2="700"/>
+                    <line x1="150" y1="700" x2="360" y2="840"/>
+                    <line x1="360" y1="840" x2="620" y2="780"/>
+                    <line x1="560" y1="600" x2="620" y2="780"/>
+                </g>
+
+                <!-- nós -->
+                <g fill="#2ec4c4">
+                    <circle cx="150" cy="180" r="7"/>
+                    <circle cx="380" cy="300" r="10"/>
+                    <circle cx="640" cy="220" r="6"/>
+                    <circle cx="300" cy="520" r="9"/>
+                    <circle cx="560" cy="600" r="8"/>
+                    <circle cx="700" cy="480" r="6"/>
+                    <circle cx="150" cy="700" r="7"/>
+                    <circle cx="360" cy="840" r="9"/>
+                    <circle cx="620" cy="780" r="6"/>
+                </g>
+
+                <g fill="#ffffff" opacity="0.9">
+                    <circle cx="380" cy="300" r="3.5"/>
+                    <circle cx="300" cy="520" r="3"/>
+                    <circle cx="360" cy="840" r="3"/>
+                </g>
+
+            </svg>
+
+            <div class="login-visual-texto">
+                <p class="login-visual-eyebrow">LT Sistemas</p>
+                <h2>Tecnologia que organiza o seu negócio.</h2>
             </div>
 
-
-            <p class="subtitle">
-                Acesso ao sistema
-            </p>
+        </div>
 
 
-            <form id="loginForm">
+        <!-- ==============================
+             LOGIN
+        =============================== -->
+
+        <div class="login-lado-form">
+
+            <div class="login-container">
+
+                <div class="login-card">
+
+                    <div class="logo">
+
+                        <h1>
+                            LT SISTEMAS
+                        </h1>
+
+                    </div>
 
 
-                <!-- CPF -->
+                    <p class="subtitle">
+                        Acesso ao sistema
+                    </p>
 
-                <div class="form-group">
 
-                    <label for="cpf">
-                        CPF
-                    </label>
+                    <form id="loginForm">
 
-                    <input
-                        type="text"
-                        id="cpf"
-                        placeholder="000.000.000-00"
-                        maxlength="14"
-                        autocomplete="username"
-                        required
-                    >
+
+                        <!-- CPF -->
+
+                        <div class="form-group">
+
+                            <label for="cpf">
+                                CPF
+                            </label>
+
+                            <input
+                                type="text"
+                                id="cpf"
+                                placeholder="000.000.000-00"
+                                maxlength="14"
+                                autocomplete="username"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- SENHA -->
+
+                        <div class="form-group">
+
+                            <label for="senha">
+                                Senha
+                            </label>
+
+                            <input
+                                type="password"
+                                id="senha"
+                                placeholder="Digite sua senha"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- BOTÃO -->
+
+                        <button
+                            type="submit"
+                            class="btn-login"
+                        >
+                            ENTRAR
+                        </button>
+
+
+                    </form>
+
+
+                    <div class="footer">
+                        LT Sistemas © 2026
+                    </div>
 
                 </div>
 
-
-                <!-- SENHA -->
-
-                <div class="form-group">
-
-                    <label for="senha">
-                        Senha
-                    </label>
-
-                    <input
-                        type="password"
-                        id="senha"
-                        placeholder="Digite sua senha"
-                        autocomplete="current-password"
-                        required
-                    >
-
-                </div>
-
-
-                <!-- BOTÃO -->
-
-                <button
-                    type="submit"
-                    class="btn-login"
-                >
-                    ENTRAR
-                </button>
-
-
-            </form>
-
-
-            <div class="footer">
-                LT Sistemas © 2026
             </div>
 
         </div>
