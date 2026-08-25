@@ -228,7 +228,12 @@
                 <option value="Jovens">
             </datalist>
 
-            <div class="linha-dupla">
+            <label style="display:flex; align-items:center; gap:8px; margin-top:16px; font-weight:normal;">
+                <input type="checkbox" id="escalaAvisoEspecial" style="width:auto;">
+                É um aviso especial (ex: Oração, Congresso, Culto das Crianças) em vez de nomes
+            </label>
+
+            <div id="blocoNomes" class="linha-dupla">
 
                 <div>
                     <label for="escalaAbertura">Abertura</label>
@@ -242,6 +247,11 @@
 
             </div>
 
+            <div id="blocoTextoEspecial" style="display:none;">
+                <label for="escalaTextoEspecial">Texto do aviso</label>
+                <input type="text" id="escalaTextoEspecial" placeholder='Ex: "Oração às 19:00 horas" ou "Congresso Nova Esperança"'>
+            </div>
+
             <button type="submit" class="btn-salvar" id="btnSalvarEscala">Salvar escala</button>
 
             <button
@@ -253,6 +263,28 @@
             </button>
 
         </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Imprimir escala (2 semanas)</h2>
+
+        <div class="linha-dupla" style="align-items:end;">
+
+            <div>
+                <label for="dataInicioImpressao">A partir de</label>
+                <input type="date" id="dataInicioImpressao">
+            </div>
+
+            <div>
+                <button type="button" id="btnImprimirEscala" class="btn-salvar" style="margin-top:0;">
+                    🖨️ Gerar impressão de 2 semanas
+                </button>
+            </div>
+
+        </div>
 
     </div>
 
