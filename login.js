@@ -53,7 +53,18 @@ loginForm.addEventListener('submit', async function (event) {
 
         await registrarAuditoria('login', 'Login realizado no sistema.');
 
-  window.location.href = 'painel.html';
+        // Verifica se esse operador precisa trocar a senha
+        const { data: operador } = await supabaseClient
+            .from('operadores')
+            .select('deve_trocar_senha')
+            .eq('id', data.user.id)
+            .single();
+
+        if (operador?.deve_trocar_senha) {
+            window.location.href = 'trocar-senha-obrigatoria.html';
+        } else {
+            window.location.href = 'painel.html';
+        }
 
     } catch (error) {
 

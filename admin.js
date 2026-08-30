@@ -57,9 +57,6 @@ async function carregarOperadores() {
             .select('id, nome, cpf, perfil, ativo')
             .order('nome');
 
-        console.log('RESULTADO OPERADORES:', operadores);
-        console.log('ERRO OPERADORES:', error);
-
         if (error) {
             throw error;
         }
@@ -255,9 +252,6 @@ formOperador.addEventListener('submit', async (event) => {
             }
         );
 
-        console.log('Resposta da função:', data);
-        console.log('Erro da função:', error);
-
         if (error) {
             throw error;
         }
@@ -281,6 +275,12 @@ formOperador.addEventListener('submit', async (event) => {
                 .single();
 
             if (novoOperador) {
+
+                // Marca que esse operador precisa trocar a senha no primeiro login
+                await supabaseClient
+                    .from('operadores')
+                    .update({ deve_trocar_senha: true })
+                    .eq('id', novoOperador.id);
 
                 const {
                     data: modulosPerfil
@@ -1070,11 +1070,6 @@ async function resetarSenhaOperador(
 
     try {
 
-        console.log(
-            'Resetando senha do operador:',
-            operadorId
-        );
-
         const {
             data: resposta,
             error
@@ -1085,16 +1080,6 @@ async function resetarSenhaOperador(
                     operador_id: operadorId
                 }
             }
-        );
-
-        console.log(
-            'Resposta resetar senha:',
-            resposta
-        );
-
-        console.log(
-            'Erro resetar senha:',
-            error
         );
 
         if (error) {
@@ -1142,9 +1127,16 @@ async function resetarSenhaOperador(
             `Redefiniu a senha do operador "${nomeOperador}".`
         );
 
+        // Marca que esse operador precisa trocar a senha no próximo login
+        await supabaseClient
+            .from('operadores')
+            .update({ deve_trocar_senha: true })
+            .eq('id', operadorId);
+
         alert(
             `Senha de ${nomeOperador} redefinida com sucesso!\n\n` +
-            `Nova senha: 123456`
+            `Nova senha: 123456\n\n` +
+            `O operador será obrigado a trocar essa senha no próximo login.`
         );
 
     } catch (erro) {

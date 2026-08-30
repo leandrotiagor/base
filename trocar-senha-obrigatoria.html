@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troque sua senha - LT Sistemas</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#168c8c">
+
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="logo">
+                <h1>LT SISTEMAS</h1>
+            </div>
+
+            <p class="subtitle">
+                🔒 Por segurança, você precisa criar uma nova senha antes de continuar.
+            </p>
+
+            <form id="formTrocaObrigatoria">
+
+                <div class="form-group">
+                    <label for="novaSenha">Nova senha</label>
+                    <input
+                        type="password"
+                        id="novaSenha"
+                        minlength="6"
+                        placeholder="Mínimo de 6 caracteres"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmarSenha">Confirmar nova senha</label>
+                    <input
+                        type="password"
+                        id="confirmarSenha"
+                        minlength="6"
+                        placeholder="Repita a nova senha"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-login">Salvar e continuar</button>
+
+            </form>
+
+            <div class="footer">
+                <a href="#" id="btnSairTroca" style="color:#168c8c; text-decoration:none;">Sair</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="trocar-senha-obrigatoria.js"></script>
+
+</body>
+
+</html>
