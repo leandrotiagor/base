@@ -138,8 +138,18 @@ formEscala.addEventListener('submit', async (evento) => {
         texto_especial: ehAvisoEspecial ? (document.getElementById('escalaTextoEspecial').value.trim() || null) : null
     };
 
-    if (!dados.data || !dados.tipo_culto) {
-        alert('Preencha ao menos a data e o tipo de culto.');
+    if (!dados.data) {
+        alert('Preencha ao menos a data.');
+        return;
+    }
+
+    if (ehAvisoEspecial && !dados.texto_especial) {
+        alert('Preencha o texto do aviso.');
+        return;
+    }
+
+    if (!ehAvisoEspecial && !dados.tipo_culto) {
+        alert('Preencha o tipo de culto.');
         return;
     }
 
