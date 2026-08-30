@@ -125,18 +125,18 @@ async function carregarPainel() {
 card.className = 'modulo-card';
 
 card.innerHTML = `
-    <div class="modulo-icone">
-        ${modulo.icone || '📦'}
-    </div>
+    <div class="modulo-icone"></div>
 
     <div class="modulo-conteudo">
-        <h3>${modulo.nome}</h3>
+        <h3 class="modulo-nome"></h3>
 
-        <p>
-            ${modulo.descricao || ''}
-        </p>
+        <p class="modulo-descricao"></p>
     </div>
 `;
+
+card.querySelector('.modulo-icone').textContent = modulo.icone || '📦';
+card.querySelector('.modulo-nome').textContent = modulo.nome;
+card.querySelector('.modulo-descricao').textContent = modulo.descricao || '';
 
 // Mapa de módulos para suas respectivas páginas
 const PAGINAS_MODULOS = {

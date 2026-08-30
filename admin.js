@@ -84,11 +84,11 @@ async function carregarOperadores() {
             const linha = document.createElement('tr');
 
             linha.innerHTML = `
-                <td>${operador.nome}</td>
+                <td class="celula-nome"></td>
 
-                <td>${operador.cpf}</td>
+                <td class="celula-cpf"></td>
 
-                <td>${operador.perfil}</td>
+                <td class="celula-perfil"></td>
 
                 <td>
                     ${
@@ -100,38 +100,38 @@ async function carregarOperadores() {
 
                 <td>
 
-    <button
-        class="btn-editar"
-        onclick="abrirEdicaoOperador(
-            '${operador.id}'
-        )">
-        ✏️ Editar
-    </button>
+    <button class="btn-editar">✏️ Editar</button>
 
-    <button
-    class="btn-resetar"
-    onclick="resetarSenhaOperador(
-        '${operador.id}',
-        '${operador.nome.replace(/'/g, "\\'")}'
-    )">
-    🔑 Resetar senha
-</button>
+    <button class="btn-resetar">🔑 Resetar senha</button>
 
-${
-    operador.id !== usuarioAdminAtualId
-        ? `<button
-            class="btn-excluir-operador"
-            onclick="excluirOperador(
-                '${operador.id}',
-                '${operador.nome.replace(/'/g, "\\'")}'
-            )">
-            🗑️ Excluir
-        </button>`
-        : ''
-}
+    ${
+        operador.id !== usuarioAdminAtualId
+            ? '<button class="btn-excluir-operador">🗑️ Excluir</button>'
+            : ''
+    }
 
-</td>
+                </td>
             `;
+
+            // Preenche os dados via textContent (nunca via innerHTML),
+            // pra qualquer caractere digitado (aspas, HTML, etc.) ser
+            // sempre tratado como texto puro, nunca como código.
+            linha.querySelector('.celula-nome').textContent = operador.nome;
+            linha.querySelector('.celula-cpf').textContent = operador.cpf;
+            linha.querySelector('.celula-perfil').textContent = operador.perfil;
+
+            // Conecta os botões via JS (sem depender de onclick="" no HTML)
+            linha.querySelector('.btn-editar')
+                .addEventListener('click', () => abrirEdicaoOperador(operador.id));
+
+            linha.querySelector('.btn-resetar')
+                .addEventListener('click', () => resetarSenhaOperador(operador.id, operador.nome));
+
+            const botaoExcluir = linha.querySelector('.btn-excluir-operador');
+
+            if (botaoExcluir) {
+                botaoExcluir.addEventListener('click', () => excluirOperador(operador.id, operador.nome));
+            }
 
             tabela.appendChild(linha);
         });
