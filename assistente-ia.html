@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistente IA - LT Sistemas</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<style>
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+        height: 100vh;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: 0;
+    }
+
+    .chat-mensagens {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 10px 4px;
+    }
+
+    .msg {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 14.5px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .msg-usuario {
+        align-self: flex-end;
+        background: #168c8c;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+
+    .msg-ia {
+        align-self: flex-start;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-bottom-left-radius: 4px;
+    }
+
+    .msg-carregando {
+        align-self: flex-start;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        color: #9ca3af;
+        font-style: italic;
+        border-bottom-left-radius: 4px;
+    }
+
+    .msg-vazio {
+        text-align: center;
+        color: #9ca3af;
+        font-size: 14px;
+        margin-top: 40px;
+    }
+
+    .chat-form {
+        display: flex;
+        gap: 10px;
+        padding-top: 14px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .chat-form textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 14.5px;
+        font-family: Arial, sans-serif;
+        max-height: 120px;
+    }
+
+    .btn-enviar {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+        padding: 0 20px;
+    }
+
+    .btn-enviar:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .chat-aviso {
+        text-align: center;
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 8px;
+    }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .chat-container { padding: 12px; }
+        .msg { max-width: 90%; }
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>✨ Assistente IA</h1>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
+</header>
+
+<div class="chat-container">
+
+    <div id="chatMensagens" class="chat-mensagens">
+        <p class="msg-vazio">Comece uma conversa — pergunte qualquer coisa.</p>
+    </div>
+
+    <form id="formChat" class="chat-form">
+        <textarea
+            id="inputMensagem"
+            rows="1"
+            placeholder="Digite sua pergunta..."
+            required
+        ></textarea>
+        <button type="submit" class="btn-enviar" id="btnEnviar">Enviar</button>
+    </form>
+
+    <p class="chat-aviso">As respostas são geradas por IA e podem conter erros — confira informações importantes.</p>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="assistente-ia.js"></script>
+
+<script>
+    document.getElementById('btnVoltar').addEventListener('click', function () {
+        window.location.href = 'painel.html';
+    });
+</script>
+
+</body>
+
+</html>

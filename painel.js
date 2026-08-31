@@ -148,7 +148,8 @@ const PAGINAS_MODULOS = {
     'Administração': 'admin.html',
     'Auditoria': 'auditoria.html',
     'Dashboard': 'dashboard.html',
-    'Escala de Cultos': 'escala-cultos.html'
+    'Escala de Cultos': 'escala-cultos.html',
+    'Assistente IA': 'assistente-ia.html'
 };
 
 if (PAGINAS_MODULOS[modulo.nome]) {
