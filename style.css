@@ -11,9 +11,9 @@ body {
 
 .login-split {
     display: flex;
+    align-items: stretch;
     height: 100vh;
     height: 100dvh;
-    overflow: hidden;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
 }
@@ -21,6 +21,7 @@ body {
 .login-visual {
     position: relative;
     flex: 1 1 50%;
+    height: 100%;
     overflow: hidden;
     background: #0b1520;
 }
