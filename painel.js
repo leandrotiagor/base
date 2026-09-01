@@ -149,7 +149,8 @@ const PAGINAS_MODULOS = {
     'Auditoria': 'auditoria.html',
     'Dashboard': 'dashboard.html',
     'Escala de Cultos': 'escala-cultos.html',
-    'Assistente IA': 'assistente-ia.html'
+    'Assistente IA': 'assistente-ia.html',
+    'Transcrever Foto': 'transcrever-foto.html'
 };
 
 if (PAGINAS_MODULOS[modulo.nome]) {
