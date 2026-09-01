@@ -207,11 +207,17 @@
             // Remove o prefixo "data:image/jpeg;base64," antes de enviar
             const base64Puro = base64Completo.split(',')[1];
 
+            const CHAVE_PUBLICA = 'sb_publishable_Ep0zPdN8-GToiegta4fT9w_Gxf-8du_';
+
             const resposta = await fetch(
                 'https://homcoqxvnskmhkofwyef.supabase.co/functions/v1/transcrever-foto',
                 {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': CHAVE_PUBLICA,
+                        'Authorization': 'Bearer ' + CHAVE_PUBLICA
+                    },
                     body: JSON.stringify({
                         sessao_id: sessaoId,
                         imagem_base64: base64Puro,
@@ -220,10 +226,18 @@
                 }
             );
 
-            const dados = await resposta.json();
+            let dados = null;
+            let textoBruto = null;
 
-            if (!resposta.ok || dados.erro) {
-                mostrarMensagemFinal('❌', 'Não foi possível enviar', dados.erro || 'Tente novamente.');
+            try {
+                dados = await resposta.json();
+            } catch (e) {
+                textoBruto = await resposta.text().catch(() => null);
+            }
+
+            if (!resposta.ok || dados?.erro) {
+                const detalhe = dados?.erro || textoBruto || `Erro ${resposta.status}`;
+                mostrarMensagemFinal('❌', 'Não foi possível enviar', detalhe);
                 return;
             }
 
@@ -231,7 +245,7 @@
 
         } catch (erro) {
             console.error('Erro ao enviar foto:', erro);
-            mostrarMensagemFinal('❌', 'Erro ao enviar', 'Verifique sua internet e tente novamente.');
+            mostrarMensagemFinal('❌', 'Erro ao enviar', erro.message || 'Verifique sua internet e tente novamente.');
         }
     });
 
