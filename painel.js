@@ -125,18 +125,18 @@ async function carregarPainel() {
 card.className = 'modulo-card';
 
 card.innerHTML = `
-    <div class="modulo-icone"></div>
+    <div class="modulo-icone">
+        ${modulo.icone || '📦'}
+    </div>
 
     <div class="modulo-conteudo">
-        <h3 class="modulo-nome"></h3>
+        <h3>${modulo.nome}</h3>
 
-        <p class="modulo-descricao"></p>
+        <p>
+            ${modulo.descricao || ''}
+        </p>
     </div>
 `;
-
-card.querySelector('.modulo-icone').textContent = modulo.icone || '📦';
-card.querySelector('.modulo-nome').textContent = modulo.nome;
-card.querySelector('.modulo-descricao').textContent = modulo.descricao || '';
 
 // Mapa de módulos para suas respectivas páginas
 const PAGINAS_MODULOS = {
@@ -150,7 +150,8 @@ const PAGINAS_MODULOS = {
     'Dashboard': 'dashboard.html',
     'Escala de Cultos': 'escala-cultos.html',
     'Assistente IA': 'assistente-ia.html',
-    'Transcrever Foto': 'transcrever-foto.html'
+    'Transcrever Foto': 'transcrever-foto.html',
+    'Credencial de Membros': 'credencial-membros.html'
 };
 
 if (PAGINAS_MODULOS[modulo.nome]) {

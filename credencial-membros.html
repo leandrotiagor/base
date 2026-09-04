@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credencial de Membros - LT Sistemas</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<style>
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #1f2937;
+    }
+
+    header {
+        background: #ffffff;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    header h1 { margin: 0; font-size: 24px; }
+
+    .container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    button {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-voltar { background: #e5e7eb; color: #111827; }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    .card h2 { margin: 0 0 16px; font-size: 18px; }
+
+    .form-grade {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 24px;
+    }
+
+    .coluna-foto {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .foto-preview {
+        width: 140px;
+        height: 176px; /* proporção 2x4 (largura x altura, ~ carteirinha) */
+        border: 2px dashed #d1d5db;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        overflow: hidden;
+        background: #f9fafb;
+        text-align: center;
+        font-size: 12px;
+        color: #9ca3af;
+        padding: 8px;
+    }
+
+    .foto-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .btn-qrcode-foto {
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    input[type="file"] { display: none; }
+
+    form label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 6px;
+        margin-top: 14px;
+    }
+
+    form label:first-child { margin-top: 0; }
+
+    form input, form textarea {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+    }
+
+    .linha-dupla {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .btn-salvar {
+        background: #168c8c;
+        color: #fff;
+        font-weight: bold;
+        margin-top: 20px;
+        width: 100%;
+        padding: 13px;
+    }
+
+    .btn-cancelar-edicao {
+        width: 100%;
+        margin-top: 10px;
+        background: #e5e7eb;
+        color: #111827;
+        display: none;
+    }
+
+    .tabela-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    th { font-size: 13px; color: #6b7280; }
+
+    .foto-mini {
+        width: 32px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
+        background: #f3f4f6;
+    }
+
+    .btn-acao {
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 6px 10px;
+        font-size: 12px;
+        margin-right: 6px;
+    }
+
+    .btn-acao-excluir {
+        background: #fde8e8;
+        color: #b42318;
+        padding: 6px 10px;
+        font-size: 12px;
+        margin-right: 6px;
+    }
+
+    .btn-imprimir {
+        background: #111827;
+        color: #fff;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .mensagem { padding: 20px; text-align: center; color: #6b7280; }
+
+    /* MODAL DO QR CODE */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: none;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px;
+        z-index: 1000;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-caixa {
+        background: #fff;
+        width: 100%;
+        max-width: 360px;
+        margin: 40px 0;
+        border-radius: 14px;
+        padding: 25px;
+        text-align: center;
+    }
+
+    .modal-caixa h3 { margin: 0 0 16px; }
+
+    #areaQrcodeFoto {
+        display: flex;
+        justify-content: center;
+        margin: 16px 0;
+    }
+
+    .status-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid #d1d5db;
+        border-top-color: #168c8c;
+        border-radius: 50%;
+        animation: girar 0.8s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    @keyframes girar {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 700px) {
+        header { padding: 15px; }
+        .container { margin: 20px auto; padding: 0 10px; }
+        .form-grade { grid-template-columns: 1fr; }
+        .coluna-foto { flex-direction: row; justify-content: center; }
+        .linha-dupla { grid-template-columns: 1fr; }
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>🪪 Credencial de Membros</h1>
+    <button class="btn-voltar" id="btnVoltar" type="button">← Voltar</button>
+</header>
+
+
+<div class="container">
+
+    <div class="card">
+
+        <h2 id="tituloForm">Novo membro</h2>
+
+        <form id="formMembro">
+
+            <input type="hidden" id="membroId">
+
+            <div class="form-grade">
+
+                <div class="coluna-foto">
+
+                    <label for="inputFoto" class="foto-preview" id="fotoPreview">
+                        <span id="fotoPlaceholder">Clique para anexar<br>foto 2x4</span>
+                        <img id="fotoImg" style="display:none;" alt="Foto do membro">
+                    </label>
+
+                    <input type="file" id="inputFoto" accept="image/*">
+
+                    <button type="button" class="btn-qrcode-foto" id="btnQrcodeFoto">
+                        📱 Enviar pelo celular
+                    </button>
+
+                </div>
+
+                <div>
+
+                    <label for="nomeCompleto">Nome completo</label>
+                    <input type="text" id="nomeCompleto" required>
+
+                    <div class="linha-dupla">
+
+                        <div>
+                            <label for="dataNascimento">Data de nascimento</label>
+                            <input type="date" id="dataNascimento">
+                        </div>
+
+                        <div>
+                            <label for="dataBatismo">Data de batismo</label>
+                            <input type="date" id="dataBatismo">
+                        </div>
+
+                    </div>
+
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" placeholder="(00) 00000-0000">
+
+                    <label for="endereco">Endereço</label>
+                    <textarea id="endereco" rows="2" placeholder="Rua, número, bairro, cidade/UF"></textarea>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-salvar" id="btnSalvarMembro">Salvar membro</button>
+            <button type="button" class="btn-cancelar-edicao" id="btnCancelarEdicao">Cancelar edição</button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Membros cadastrados</h2>
+
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Nascimento</th>
+                        <th>Batismo</th>
+                        <th>Telefone</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaMembros">
+                    <tr><td colspan="6" class="mensagem">Carregando membros...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL QR CODE PRA FOTO -->
+<div id="modalQrcodeFoto" class="modal-overlay">
+    <div class="modal-caixa">
+        <h3>📱 Escaneie com o celular</h3>
+        <div id="areaQrcodeFoto"></div>
+        <p id="statusQrcodeFoto" style="color:#6b7280; font-size:13px;">
+            <span class="status-spinner"></span> Aguardando a foto...
+        </p>
+        <button type="button" class="btn-voltar" id="btnFecharModalQrcode" style="width:100%; margin-top:10px;">
+            Cancelar
+        </button>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="credencial-membros.js"></script>
+
+<script>
+    document.getElementById('btnVoltar').addEventListener('click', function () {
+        window.location.href = 'painel.html';
+    });
+</script>
+
+</body>
+
+</html>
