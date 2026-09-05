@@ -304,8 +304,8 @@
                     <div class="linha-dupla">
 
                         <div>
-                            <label for="dataNascimento">Data de nascimento</label>
-                            <input type="date" id="dataNascimento">
+                            <label for="ondeCongrega">Onde congrega</label>
+                            <input type="text" id="ondeCongrega" placeholder="Ex: Sede">
                         </div>
 
                         <div>
@@ -315,11 +315,81 @@
 
                     </div>
 
+                    <div class="linha-dupla">
+
+                        <div>
+                            <label for="dataNascimento">Data de nascimento</label>
+                            <input type="date" id="dataNascimento">
+                        </div>
+
+                        <div>
+                            <label for="estadoCivil">Estado civil</label>
+                            <input type="text" id="estadoCivil" placeholder="Ex: Casado(a), Solteiro(a)">
+                        </div>
+
+                    </div>
+
                     <label for="telefone">Telefone</label>
                     <input type="text" id="telefone" placeholder="(00) 00000-0000">
 
-                    <label for="endereco">Endereço</label>
-                    <textarea id="endereco" rows="2" placeholder="Rua, número, bairro, cidade/UF"></textarea>
+                    <div class="linha-dupla">
+
+                        <div>
+                            <label for="endereco">Endereço</label>
+                            <input type="text" id="endereco" placeholder="Rua/Av.">
+                        </div>
+
+                        <div>
+                            <label for="numero">Número</label>
+                            <input type="text" id="numero">
+                        </div>
+
+                    </div>
+
+                    <div class="linha-dupla">
+
+                        <div>
+                            <label for="bairro">Bairro</label>
+                            <input type="text" id="bairro">
+                        </div>
+
+                        <div>
+                            <label for="cidade">Cidade</label>
+                            <input type="text" id="cidade">
+                        </div>
+
+                    </div>
+
+                    <label for="estado">Estado</label>
+                    <input type="text" id="estado" placeholder="Ex: MG" maxlength="2" style="max-width:100px;">
+
+                    <div class="linha-dupla">
+
+                        <div>
+                            <label for="naturalidade">Natural de</label>
+                            <input type="text" id="naturalidade" placeholder="Cidade onde nasceu">
+                        </div>
+
+                        <div>
+                            <label for="naturalidadeEstado">Estado (naturalidade)</label>
+                            <input type="text" id="naturalidadeEstado" placeholder="Ex: MG" maxlength="2">
+                        </div>
+
+                    </div>
+
+                    <div class="linha-dupla">
+
+                        <div>
+                            <label for="nomePai">Nome do pai</label>
+                            <input type="text" id="nomePai">
+                        </div>
+
+                        <div>
+                            <label for="nomeMae">Nome da mãe</label>
+                            <input type="text" id="nomeMae">
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -327,6 +397,7 @@
 
             <button type="submit" class="btn-salvar" id="btnSalvarMembro">Salvar membro</button>
             <button type="button" class="btn-cancelar-edicao" id="btnCancelarEdicao">Cancelar edição</button>
+
 
         </form>
 
