@@ -409,7 +409,7 @@ async function excluirMembro(membro) {
 
 function imprimirCredencial(membro) {
 
-    const janela = window.open('', '_blank', 'width=760,height=480');
+    const janela = window.open('', '_blank', 'width=820,height=400');
 
     if (!janela) {
         alert('Seu navegador bloqueou a janela de impressão. Permita pop-ups para este site.');
@@ -434,121 +434,160 @@ function imprimirCredencial(membro) {
             <title>Credencial - ${membro.nome_completo}</title>
             <style>
                 * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+                @page {
+                    size: 20cm 7cm;
+                    margin: 0;
+                }
+
                 body {
                     font-family: Arial, sans-serif;
                     display: flex;
                     justify-content: center;
-                    padding: 20px;
+                    align-items: center;
+                    padding: 10px;
                     background: #eee;
                 }
+
                 .credencial {
                     display: flex;
+                    width: 20cm;
+                    height: 7cm;
                     background: #fff;
                     border: 1px solid #999;
                     box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+                    overflow: hidden;
                 }
+
                 .painel {
-                    width: 330px;
-                    padding: 16px 18px;
-                    border-left: 4px solid #c0392b;
+                    width: 10cm;
+                    height: 7cm;
+                    padding: 0.35cm 0.4cm;
+                    border-left: 0.12cm solid #c0392b;
                     position: relative;
+                    overflow: hidden;
                 }
+
                 .painel + .painel {
-                    border-left: 4px solid #1f3a93;
-                    border-left-style: dashed;
+                    border-left: 0.12cm dashed #1f3a93;
                 }
+
                 .titulo-painel {
-                    font-size: 15px;
+                    font-size: 0.34cm;
                     font-weight: bold;
-                    margin: 0 0 6px;
-                    letter-spacing: 0.02em;
+                    margin: 0 0 0.12cm;
+                    letter-spacing: 0.01em;
+                    line-height: 1.15;
                 }
+
                 .regua {
-                    height: 3px;
+                    height: 0.06cm;
                     background: #c0392b;
-                    margin-bottom: 2px;
+                    margin-bottom: 0.04cm;
                 }
+
                 .regua-azul {
-                    height: 2px;
+                    height: 0.045cm;
                     background: #1f3a93;
-                    margin-bottom: 12px;
+                    margin-bottom: 0.22cm;
                 }
+
                 .linha-campo {
-                    font-size: 12.5px;
-                    margin-bottom: 8px;
-                    border-bottom: 1px solid #333;
-                    padding-bottom: 2px;
+                    font-size: 0.24cm;
+                    margin-bottom: 0.14cm;
+                    border-bottom: 0.4pt solid #333;
+                    padding-bottom: 0.03cm;
+                    line-height: 1.2;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
                 .linha-campo .rotulo { color: #111; }
                 .linha-campo .valor { font-weight: normal; }
 
                 .bloco-esquerdo-inferior {
                     display: flex;
-                    gap: 14px;
-                    margin-top: 18px;
+                    gap: 0.3cm;
+                    margin-top: 0.2cm;
                     align-items: flex-start;
                 }
+
                 .foto-credencial {
-                    width: 90px;
-                    height: 116px;
+                    width: 2.4cm;
+                    height: 3.1cm;
                     object-fit: cover;
-                    border: 1px solid #ccc;
+                    border: 0.4pt solid #ccc;
                     background: #f3f4f6;
                     flex-shrink: 0;
                 }
+
                 .verso-texto {
                     font-family: Georgia, 'Times New Roman', serif;
                     font-style: italic;
-                    font-size: 12.5px;
+                    font-size: 0.24cm;
                     text-align: center;
-                    line-height: 1.4;
+                    line-height: 1.35;
                 }
                 .verso-texto .citacao {
                     display: block;
-                    margin-top: 8px;
+                    margin-top: 0.15cm;
                     font-weight: bold;
                     font-style: normal;
-                    font-size: 12px;
+                    font-size: 0.22cm;
                 }
+
                 .nota-rodape-esquerda {
-                    font-size: 9px;
+                    font-size: 0.16cm;
                     color: #333;
                     text-align: center;
-                    margin-top: 14px;
+                    margin-top: 0.2cm;
+                    line-height: 1.2;
                 }
 
                 .subtitulo-endereco {
-                    font-size: 11px;
+                    font-size: 0.19cm;
                     color: #333;
                     text-align: center;
-                    margin-bottom: 14px;
-                    line-height: 1.4;
+                    margin-bottom: 0.18cm;
+                    line-height: 1.25;
                 }
 
                 .campo-linha-dupla {
                     display: flex;
-                    gap: 10px;
+                    gap: 0.2cm;
                 }
-                .campo-linha-dupla .linha-campo { flex: 1; }
+                .campo-linha-dupla .linha-campo { flex: 1; min-width: 0; }
 
                 .assinatura {
-                    margin-top: 22px;
+                    margin-top: 0.22cm;
                     text-align: center;
                 }
                 .assinatura .nome-assinatura {
                     font-family: 'Brush Script MT', cursive;
-                    font-size: 20px;
-                    border-bottom: 1px solid #333;
-                    padding-bottom: 4px;
-                    margin-bottom: 4px;
+                    font-size: 0.4cm;
+                    border-bottom: 0.4pt solid #333;
+                    padding-bottom: 0.05cm;
+                    margin-bottom: 0.05cm;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
                 .assinatura .rotulo-assinatura {
-                    font-size: 10px;
+                    font-size: 0.17cm;
                     color: #555;
                 }
 
                 @media print {
-                    body { padding: 0; background: #fff; }
+                    body {
+                        padding: 0;
+                        background: #fff;
+                        align-items: stretch;
+                        justify-content: stretch;
+                    }
+                    .credencial {
+                        border: none;
+                        box-shadow: none;
+                    }
                 }
             </style>
         </head>
@@ -616,7 +655,7 @@ function imprimirCredencial(membro) {
                             <span class="rotulo">Cidade:</span>
                             <span class="valor"> ${escaparHtmlCredencial(membro.cidade || '—')}</span>
                         </div>
-                        <div class="linha-campo" style="flex: 0 0 60px;">
+                        <div class="linha-campo" style="flex: 0 0 1.2cm;">
                             <span class="rotulo">Est.:</span>
                             <span class="valor"> ${escaparHtmlCredencial(membro.estado || '—')}</span>
                         </div>
