@@ -504,6 +504,8 @@ function gerarHtmlCartao(membro) {
                 <div class="painel">
 
                     <div class="titulo-painel">IGREJA PENTECOSTAL DE JESUS CRISTO</div>
+                    <div class="regua"></div>
+                    <div class="regua-azul"></div>
 
                     <div class="subtitulo-endereco">
                         Sede: R. Gen. Djalma da Rocha Lima, 70 - Cep 81730-370<br>
@@ -637,14 +639,29 @@ function imprimirCredencial(membros) {
                 .painel {
                     width: 10cm;
                     height: 7cm;
-                    padding: 0.35cm 0.4cm;
-                    border-left: 0.12cm solid #c0392b;
+                    padding: 0.35cm 0.4cm 0.35cm 0.6cm;
                     position: relative;
                     overflow: hidden;
                 }
 
-                .painel + .painel {
-                    border-left: 0.12cm dashed #1f3a93;
+                .painel::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 0.08cm;
+                    background: #c0392b;
+                }
+
+                .painel::after {
+                    content: '';
+                    position: absolute;
+                    left: 0.12cm;
+                    top: 0;
+                    bottom: 0;
+                    width: 0.06cm;
+                    background: #1f3a93;
                 }
 
                 .titulo-painel {
