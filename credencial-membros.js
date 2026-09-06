@@ -563,7 +563,7 @@ function gerarHtmlCartao(membro) {
                     </div>
 
                     <div class="assinatura">
-                        <div class="nome-assinatura">${escaparHtmlCredencial(membro.nome_completo)}</div>
+                        <div class="nome-assinatura">&nbsp;</div>
                         <div class="rotulo-assinatura">Ass. do Portador</div>
                     </div>
 
@@ -653,6 +653,7 @@ function imprimirCredencial(membros) {
                     margin: 0 0 0.12cm;
                     letter-spacing: 0.01em;
                     line-height: 1.15;
+                    text-align: center;
                 }
 
                 .regua {
@@ -684,7 +685,7 @@ function imprimirCredencial(membros) {
                     display: flex;
                     gap: 0.3cm;
                     margin-top: 0.2cm;
-                    align-items: flex-start;
+                    align-items: center;
                 }
 
                 .foto-credencial {
