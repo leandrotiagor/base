@@ -706,8 +706,8 @@ function imprimirCredencial(membros) {
                 }
 
                 .foto-credencial {
-                    width: 2.4cm;
-                    height: 3.1cm;
+                    width: 2.8cm;
+                    height: 3.6cm;
                     object-fit: cover;
                     border: 0.4pt solid #ccc;
                     background: #f3f4f6;
@@ -730,10 +730,13 @@ function imprimirCredencial(membros) {
                 }
 
                 .nota-rodape-esquerda {
+                    position: absolute;
+                    left: 0.6cm;
+                    right: 0.4cm;
+                    bottom: 0.3cm;
                     font-size: 0.16cm;
                     color: #333;
                     text-align: center;
-                    margin-top: 0.2cm;
                     line-height: 1.2;
                 }
 
