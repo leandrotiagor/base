@@ -406,12 +406,18 @@
 
     <div class="card">
 
-        <h2>Membros cadastrados</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+            <h2 style="margin:0;">Membros cadastrados</h2>
+            <button type="button" class="btn-imprimir" id="btnImprimirSelecionados" disabled>
+                🖨️ Imprimir selecionados (0)
+            </button>
+        </div>
 
         <div class="tabela-wrap">
             <table>
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Foto</th>
                         <th>Nome</th>
                         <th>Nascimento</th>
@@ -421,7 +427,7 @@
                     </tr>
                 </thead>
                 <tbody id="listaMembros">
-                    <tr><td colspan="6" class="mensagem">Carregando membros...</td></tr>
+                    <tr><td colspan="7" class="mensagem">Carregando membros...</td></tr>
                 </tbody>
             </table>
         </div>

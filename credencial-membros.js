@@ -18,6 +18,9 @@ let fotoMimeAtual = null;
 let nomeOperadorAtual = null;
 let usuarioAtualId = null;
 
+let membrosCache = [];
+let idsSelecionados = new Set();
+
 
 // =====================================================
 // FOTO - UPLOAD DIRETO (CLICANDO NA PRÉVIA)
@@ -175,7 +178,7 @@ document.getElementById('btnFecharModalQrcode').addEventListener('click', () => 
 
 async function carregarMembros() {
 
-    listaMembros.innerHTML = '<tr><td colspan="6" class="mensagem">Carregando membros...</td></tr>';
+    listaMembros.innerHTML = '<tr><td colspan="7" class="mensagem">Carregando membros...</td></tr>';
 
     const { data, error } = await supabaseClient
         .from('membros')
@@ -184,22 +187,27 @@ async function carregarMembros() {
 
     if (error) {
         console.error('Erro ao carregar membros:', error);
-        listaMembros.innerHTML = '<tr><td colspan="6" class="mensagem">Erro ao carregar membros.</td></tr>';
+        listaMembros.innerHTML = '<tr><td colspan="7" class="mensagem">Erro ao carregar membros.</td></tr>';
         return;
     }
 
-    if (!data || data.length === 0) {
-        listaMembros.innerHTML = '<tr><td colspan="6" class="mensagem">Nenhum membro cadastrado ainda.</td></tr>';
+    membrosCache = data || [];
+    idsSelecionados.clear();
+    atualizarBotaoImprimirSelecionados();
+
+    if (membrosCache.length === 0) {
+        listaMembros.innerHTML = '<tr><td colspan="7" class="mensagem">Nenhum membro cadastrado ainda.</td></tr>';
         return;
     }
 
     listaMembros.innerHTML = '';
 
-    data.forEach(membro => {
+    membrosCache.forEach(membro => {
 
         const linha = document.createElement('tr');
 
         linha.innerHTML = `
+            <td><input type="checkbox" class="checkbox-membro" data-id="${membro.id}"></td>
             <td></td>
             <td class="celula-nome"></td>
             <td class="celula-nascimento"></td>
@@ -212,7 +220,7 @@ async function carregarMembros() {
             </td>
         `;
 
-        const celulaFoto = linha.children[0];
+        const celulaFoto = linha.children[1];
 
         if (membro.foto_base64) {
             const img = document.createElement('img');
@@ -230,11 +238,51 @@ async function carregarMembros() {
 
         linha.querySelector('.btn-editar').addEventListener('click', () => preencherParaEdicao(membro));
         linha.querySelector('.btn-excluir').addEventListener('click', () => excluirMembro(membro));
-        linha.querySelector('.btn-imprimir-credencial').addEventListener('click', () => imprimirCredencial(membro));
+        linha.querySelector('.btn-imprimir-credencial').addEventListener('click', () => imprimirCredencial([membro]));
+
+        linha.querySelector('.checkbox-membro').addEventListener('change', (evento) => {
+
+            const id = evento.target.dataset.id;
+
+            if (evento.target.checked) {
+
+                if (idsSelecionados.size >= 3) {
+                    evento.target.checked = false;
+                    alert('Você pode selecionar no máximo 3 membros por folha.');
+                    return;
+                }
+
+                idsSelecionados.add(id);
+
+            } else {
+                idsSelecionados.delete(id);
+            }
+
+            atualizarBotaoImprimirSelecionados();
+        });
 
         listaMembros.appendChild(linha);
     });
 }
+
+
+function atualizarBotaoImprimirSelecionados() {
+
+    const botao = document.getElementById('btnImprimirSelecionados');
+
+    botao.textContent = `🖨️ Imprimir selecionados (${idsSelecionados.size})`;
+    botao.disabled = idsSelecionados.size === 0;
+}
+
+
+document.getElementById('btnImprimirSelecionados').addEventListener('click', () => {
+
+    const membrosSelecionados = membrosCache.filter(m => idsSelecionados.has(m.id));
+
+    if (membrosSelecionados.length === 0) return;
+
+    imprimirCredencial(membrosSelecionados);
+});
 
 
 function formatarDataBR(dataISO) {
@@ -407,14 +455,7 @@ async function excluirMembro(membro) {
 // =====================================================
 
 
-function imprimirCredencial(membro) {
-
-    const janela = window.open('', '_blank', 'width=820,height=400');
-
-    if (!janela) {
-        alert('Seu navegador bloqueou a janela de impressão. Permita pop-ups para este site.');
-        return;
-    }
+function gerarHtmlCartao(membro) {
 
     const fotoSrc = membro.foto_base64
         ? `data:${membro.foto_mime_type || 'image/jpeg'};base64,${membro.foto_base64}`
@@ -426,27 +467,159 @@ function imprimirCredencial(membro) {
     const naturalLinha = [membro.naturalidade, membro.naturalidade_estado]
         .filter(Boolean).join(' - ');
 
+    return `
+            <div class="credencial">
+
+                <div class="painel">
+
+                    <div class="titulo-painel">IDENTIDADE DE MEMBRO</div>
+                    <div class="regua"></div>
+                    <div class="regua-azul"></div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Onde congrega:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(membro.onde_congrega || '')}</span>
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Data do batismo:</span>
+                        <span class="valor"> ${formatarDataBR(membro.data_batismo)}</span>
+                    </div>
+
+                    <div class="bloco-esquerdo-inferior">
+
+                        ${fotoSrc ? `<img class="foto-credencial" src="${fotoSrc}" alt="Foto">` : '<div class="foto-credencial"></div>'}
+
+                        <div class="verso-texto">
+                            Sofre pois, comigo, as aflições como bom soldado de Jesus Cristo.
+                            <span class="citacao">II Tim. 2.3</span>
+                        </div>
+
+                    </div>
+
+                    <div class="nota-rodape-esquerda">Só é Válida com o Visto Anual do Dirigente no Verso</div>
+
+                </div>
+
+                <div class="painel">
+
+                    <div class="titulo-painel">IGREJA PENTECOSTAL DE JESUS CRISTO</div>
+
+                    <div class="subtitulo-endereco">
+                        Sede: R. Gen. Djalma da Rocha Lima, 70 - Cep 81730-370<br>
+                        Boqueirão - Curitiba - Pr.
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Nome:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(membro.nome_completo)}</span>
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">End.:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(enderecoLinha || '—')}</span>
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Bairro:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(membro.bairro || '—')}</span>
+                    </div>
+
+                    <div class="campo-linha-dupla">
+                        <div class="linha-campo">
+                            <span class="rotulo">Cidade:</span>
+                            <span class="valor"> ${escaparHtmlCredencial(membro.cidade || '—')}</span>
+                        </div>
+                        <div class="linha-campo" style="flex: 0 0 1.2cm;">
+                            <span class="rotulo">Est.:</span>
+                            <span class="valor"> ${escaparHtmlCredencial(membro.estado || '—')}</span>
+                        </div>
+                    </div>
+
+                    <div class="campo-linha-dupla">
+                        <div class="linha-campo">
+                            <span class="rotulo">Nascimento:</span>
+                            <span class="valor"> ${formatarDataBR(membro.data_nascimento)}</span>
+                        </div>
+                        <div class="linha-campo">
+                            <span class="rotulo">Est. Civil:</span>
+                            <span class="valor"> ${escaparHtmlCredencial(membro.estado_civil || '—')}</span>
+                        </div>
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Natural:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(naturalLinha || '—')}</span>
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Pai:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(membro.nome_pai || '—')}</span>
+                    </div>
+
+                    <div class="linha-campo">
+                        <span class="rotulo">Mãe:</span>
+                        <span class="valor"> ${escaparHtmlCredencial(membro.nome_mae || '—')}</span>
+                    </div>
+
+                    <div class="assinatura">
+                        <div class="nome-assinatura">${escaparHtmlCredencial(membro.nome_completo)}</div>
+                        <div class="rotulo-assinatura">Ass. do Portador</div>
+                    </div>
+
+                </div>
+
+            </div>
+    `;
+}
+
+
+function imprimirCredencial(membros) {
+
+    if (!Array.isArray(membros)) {
+        membros = [membros];
+    }
+
+    if (membros.length > 3) {
+        alert('É possível imprimir no máximo 3 credenciais por folha.');
+        return;
+    }
+
+    const janela = window.open('', '_blank', 'width=900,height=1000');
+
+    if (!janela) {
+        alert('Seu navegador bloqueou a janela de impressão. Permita pop-ups para este site.');
+        return;
+    }
+
+    const cartoesHtml = membros.map(gerarHtmlCartao).join('\n');
+
     janela.document.write(`
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
             <meta charset="UTF-8">
-            <title>Credencial - ${membro.nome_completo}</title>
+            <title>Credencial de Membros</title>
             <style>
                 * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
                 @page {
-                    size: 20cm 7cm;
-                    margin: 0;
+                    size: A4 portrait;
+                    margin: 1cm;
                 }
 
                 body {
                     font-family: Arial, sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    padding: 10px;
                     background: #eee;
+                    margin: 0;
+                    padding: 1cm;
+                }
+
+                .folha {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0.6cm;
                 }
 
                 .credencial {
@@ -457,6 +630,8 @@ function imprimirCredencial(membro) {
                     border: 1px solid #999;
                     box-shadow: 0 4px 14px rgba(0,0,0,0.15);
                     overflow: hidden;
+                    break-inside: avoid;
+                    page-break-inside: avoid;
                 }
 
                 .painel {
@@ -581,8 +756,9 @@ function imprimirCredencial(membro) {
                     body {
                         padding: 0;
                         background: #fff;
-                        align-items: stretch;
-                        justify-content: stretch;
+                    }
+                    .folha {
+                        gap: 0.4cm;
                     }
                     .credencial {
                         border: none;
@@ -593,107 +769,8 @@ function imprimirCredencial(membro) {
         </head>
         <body>
 
-            <div class="credencial">
-
-                <div class="painel">
-
-                    <div class="titulo-painel">IDENTIDADE DE MEMBRO</div>
-                    <div class="regua"></div>
-                    <div class="regua-azul"></div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Onde congrega:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(membro.onde_congrega || '')}</span>
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Data do batismo:</span>
-                        <span class="valor"> ${formatarDataBR(membro.data_batismo)}</span>
-                    </div>
-
-                    <div class="bloco-esquerdo-inferior">
-
-                        ${fotoSrc ? `<img class="foto-credencial" src="${fotoSrc}" alt="Foto">` : '<div class="foto-credencial"></div>'}
-
-                        <div class="verso-texto">
-                            Sofre pois, comigo, as aflições como bom soldado de Jesus Cristo.
-                            <span class="citacao">II Tim. 2.3</span>
-                        </div>
-
-                    </div>
-
-                    <div class="nota-rodape-esquerda">Só é Válida com o Visto Anual do Dirigente no Verso</div>
-
-                </div>
-
-                <div class="painel">
-
-                    <div class="titulo-painel">IGREJA PENTECOSTAL DE JESUS CRISTO</div>
-
-                    <div class="subtitulo-endereco">
-                        Sede: R. Gen. Djalma da Rocha Lima, 70 - Cep 81730-370<br>
-                        Boqueirão - Curitiba - Pr.
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Nome:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(membro.nome_completo)}</span>
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">End.:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(enderecoLinha || '—')}</span>
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Bairro:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(membro.bairro || '—')}</span>
-                    </div>
-
-                    <div class="campo-linha-dupla">
-                        <div class="linha-campo">
-                            <span class="rotulo">Cidade:</span>
-                            <span class="valor"> ${escaparHtmlCredencial(membro.cidade || '—')}</span>
-                        </div>
-                        <div class="linha-campo" style="flex: 0 0 1.2cm;">
-                            <span class="rotulo">Est.:</span>
-                            <span class="valor"> ${escaparHtmlCredencial(membro.estado || '—')}</span>
-                        </div>
-                    </div>
-
-                    <div class="campo-linha-dupla">
-                        <div class="linha-campo">
-                            <span class="rotulo">Nascimento:</span>
-                            <span class="valor"> ${formatarDataBR(membro.data_nascimento)}</span>
-                        </div>
-                        <div class="linha-campo">
-                            <span class="rotulo">Est. Civil:</span>
-                            <span class="valor"> ${escaparHtmlCredencial(membro.estado_civil || '—')}</span>
-                        </div>
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Natural:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(naturalLinha || '—')}</span>
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Pai:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(membro.nome_pai || '—')}</span>
-                    </div>
-
-                    <div class="linha-campo">
-                        <span class="rotulo">Mãe:</span>
-                        <span class="valor"> ${escaparHtmlCredencial(membro.nome_mae || '—')}</span>
-                    </div>
-
-                    <div class="assinatura">
-                        <div class="nome-assinatura">${escaparHtmlCredencial(membro.nome_completo)}</div>
-                        <div class="rotulo-assinatura">Ass. do Portador</div>
-                    </div>
-
-                </div>
-
+            <div class="folha">
+                ${cartoesHtml}
             </div>
 
         </body>
