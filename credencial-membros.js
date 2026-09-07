@@ -455,6 +455,37 @@ async function excluirMembro(membro) {
 // =====================================================
 
 
+function gerarHtmlVerso() {
+
+    const linhas = Array.from({ length: 5 }).map(() => `
+        <div class="verso-linha">
+            <div class="verso-data-campo"></div>
+            <div class="verso-visto-campo">
+                <div class="verso-nome-linha"></div>
+                <div class="verso-cargo">Responsável Regional</div>
+            </div>
+        </div>
+    `).join('');
+
+    const painelVerso = `
+        <div class="verso-painel">
+            <div class="verso-cabecalho">
+                <span class="verso-titulo-data">DATA</span>
+                <span class="verso-titulo-visto">VISTO ANUAL DO RESP. ESTADUAL</span>
+            </div>
+            ${linhas}
+        </div>
+    `;
+
+    return `
+            <div class="verso-credencial">
+                ${painelVerso}
+                ${painelVerso}
+            </div>
+    `;
+}
+
+
 function gerarHtmlCartao(membro) {
 
     const fotoSrc = membro.foto_base64
@@ -595,6 +626,7 @@ function imprimirCredencial(membros) {
     }
 
     const cartoesHtml = membros.map(gerarHtmlCartao).join('\n');
+    const versosHtml = membros.map(gerarHtmlVerso).join('\n');
 
     janela.document.write(`
         <!DOCTYPE html>
@@ -785,6 +817,92 @@ function imprimirCredencial(membros) {
                         border: none;
                         box-shadow: none;
                     }
+                    .folha-verso {
+                        page-break-before: always;
+                    }
+                    .verso-credencial {
+                        border: none;
+                        box-shadow: none;
+                    }
+                }
+
+                /* =====================================================
+                   VERSO DO CARTÃO (VISTO ANUAL)
+                ===================================================== */
+
+                .verso-credencial {
+                    display: flex;
+                    width: 20cm;
+                    height: 7cm;
+                    background: #fff;
+                    border: 1px solid #999;
+                    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+                    overflow: hidden;
+                }
+
+                .verso-painel {
+                    width: 10cm;
+                    height: 7cm;
+                    padding: 0.3cm 0.4cm;
+                    border-left: 0.4pt solid #ccc;
+                }
+
+                .verso-painel:first-child {
+                    border-left: none;
+                }
+
+                .verso-cabecalho {
+                    display: flex;
+                    border-bottom: 1pt solid #333;
+                    padding-bottom: 0.1cm;
+                    margin-bottom: 0.15cm;
+                }
+
+                .verso-titulo-data {
+                    width: 2.3cm;
+                    font-size: 0.24cm;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    flex-shrink: 0;
+                }
+
+                .verso-titulo-visto {
+                    font-size: 0.24cm;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    text-align: center;
+                    flex: 1;
+                }
+
+                .verso-linha {
+                    display: flex;
+                    align-items: flex-end;
+                    height: 1.05cm;
+                    gap: 0.2cm;
+                }
+
+                .verso-data-campo {
+                    width: 2.3cm;
+                    height: 0.55cm;
+                    flex-shrink: 0;
+                    border-bottom: 0.4pt solid #999;
+                }
+
+                .verso-visto-campo {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .verso-nome-linha {
+                    height: 0.55cm;
+                    border-bottom: 0.4pt solid #999;
+                }
+
+                .verso-cargo {
+                    font-size: 0.16cm;
+                    color: #666;
+                    text-align: center;
+                    margin-top: 0.03cm;
                 }
             </style>
         </head>
@@ -792,6 +910,10 @@ function imprimirCredencial(membros) {
 
             <div class="folha">
                 ${cartoesHtml}
+            </div>
+
+            <div class="folha folha-verso">
+                ${versosHtml}
             </div>
 
         </body>
