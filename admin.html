@@ -576,28 +576,15 @@
                 </label>
 
                 <select id="perfilOperador">
-
-                    <option value="operador">
-                        Operador
-                    </option>
-
-                    <option value="gerente">
-                        Gerente
-                    </option>
-
-                    <option value="caixa">
-                        Caixa
-                    </option>
-
-                    <option value="n1">
-                        N1
-                    </option>
-
-                    <option value="admin">
-                        Administrador
-                    </option>
-
                 </select>
+
+                <button
+                    type="button"
+                    id="btnGerenciarPerfis"
+                    style="background:transparent; color:#168c8c; text-decoration:underline; padding:4px 0; font-size:13px; margin-top:6px; border:none; cursor:pointer;"
+                >
+                    ⚙️ Gerenciar perfis
+                </button>
 
 
                 <label class="checkbox">
@@ -707,6 +694,71 @@
 
 
     <!-- ==============================
+         MODAL GERENCIAR PERFIS
+    =============================== -->
+
+    <div
+        id="modalGerenciarPerfis"
+        class="modal"
+        style="display: none;"
+    >
+
+        <div class="modal-conteudo">
+
+            <div class="modal-cabecalho">
+
+                <h2>
+                    ⚙️ Gerenciar Perfis
+                </h2>
+
+                <button
+                    class="fechar-modal"
+                    type="button"
+                    onclick="fecharGerenciarPerfis()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <form id="formNovoPerfil" style="display:flex; gap:8px; margin-bottom:16px;">
+
+                <input
+                    type="text"
+                    id="nomeNovoPerfil"
+                    placeholder="Nome do novo perfil (ex: Tesoureiro)"
+                    style="flex:1; padding:10px 12px; border:1px solid #d1d5db; border-radius:8px;"
+                    required
+                >
+
+                <button type="submit" class="btn-salvar" style="white-space:nowrap;">
+                    + Adicionar
+                </button>
+
+            </form>
+
+            <div id="listaPerfisGerenciar" style="display:flex; flex-direction:column; gap:8px;">
+                Carregando perfis...
+            </div>
+
+            <div class="modal-acoes">
+
+                <button
+                    class="btn-cancelar"
+                    type="button"
+                    onclick="fecharGerenciarPerfis()"
+                >
+                    Fechar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
          MODAL EDITAR OPERADOR
     =============================== -->
 
@@ -769,27 +821,6 @@
             </label>
 
             <select id="editarPerfil">
-
-                <option value="operador">
-                    Operador
-                </option>
-
-                <option value="gerente">
-                    Gerente
-                </option>
-
-                <option value="caixa">
-                    Caixa
-                </option>
-
-                <option value="n1">
-                    N1
-                </option>
-
-                <option value="admin">
-                    Administrador
-                </option>
-
             </select>
 
 

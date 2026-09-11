@@ -57,6 +57,9 @@ async function carregarOperadores() {
             .select('id, nome, cpf, perfil, ativo')
             .order('nome');
 
+        console.log('RESULTADO OPERADORES:', operadores);
+        console.log('ERRO OPERADORES:', error);
+
         if (error) {
             throw error;
         }
@@ -81,11 +84,11 @@ async function carregarOperadores() {
             const linha = document.createElement('tr');
 
             linha.innerHTML = `
-                <td class="celula-nome"></td>
+                <td>${operador.nome}</td>
 
-                <td class="celula-cpf"></td>
+                <td>${operador.cpf}</td>
 
-                <td class="celula-perfil"></td>
+                <td>${operador.perfil}</td>
 
                 <td>
                     ${
@@ -97,38 +100,38 @@ async function carregarOperadores() {
 
                 <td>
 
-    <button class="btn-editar">✏️ Editar</button>
+    <button
+        class="btn-editar"
+        onclick="abrirEdicaoOperador(
+            '${operador.id}'
+        )">
+        ✏️ Editar
+    </button>
 
-    <button class="btn-resetar">🔑 Resetar senha</button>
+    <button
+    class="btn-resetar"
+    onclick="resetarSenhaOperador(
+        '${operador.id}',
+        '${operador.nome.replace(/'/g, "\\'")}'
+    )">
+    🔑 Resetar senha
+</button>
 
-    ${
-        operador.id !== usuarioAdminAtualId
-            ? '<button class="btn-excluir-operador">🗑️ Excluir</button>'
-            : ''
-    }
+${
+    operador.id !== usuarioAdminAtualId
+        ? `<button
+            class="btn-excluir-operador"
+            onclick="excluirOperador(
+                '${operador.id}',
+                '${operador.nome.replace(/'/g, "\\'")}'
+            )">
+            🗑️ Excluir
+        </button>`
+        : ''
+}
 
-                </td>
+</td>
             `;
-
-            // Preenche os dados via textContent (nunca via innerHTML),
-            // pra qualquer caractere digitado (aspas, HTML, etc.) ser
-            // sempre tratado como texto puro, nunca como código.
-            linha.querySelector('.celula-nome').textContent = operador.nome;
-            linha.querySelector('.celula-cpf').textContent = operador.cpf;
-            linha.querySelector('.celula-perfil').textContent = operador.perfil;
-
-            // Conecta os botões via JS (sem depender de onclick="" no HTML)
-            linha.querySelector('.btn-editar')
-                .addEventListener('click', () => abrirEdicaoOperador(operador.id));
-
-            linha.querySelector('.btn-resetar')
-                .addEventListener('click', () => resetarSenhaOperador(operador.id, operador.nome));
-
-            const botaoExcluir = linha.querySelector('.btn-excluir-operador');
-
-            if (botaoExcluir) {
-                botaoExcluir.addEventListener('click', () => excluirOperador(operador.id, operador.nome));
-            }
 
             tabela.appendChild(linha);
         });
@@ -164,6 +167,7 @@ async function iniciarAdministracao() {
         return;
     }
 
+    await carregarPerfis();
     await carregarOperadores();
 }
 
@@ -252,6 +256,9 @@ formOperador.addEventListener('submit', async (event) => {
             }
         );
 
+        console.log('Resposta da função:', data);
+        console.log('Erro da função:', error);
+
         if (error) {
             throw error;
         }
@@ -275,12 +282,6 @@ formOperador.addEventListener('submit', async (event) => {
                 .single();
 
             if (novoOperador) {
-
-                // Marca que esse operador precisa trocar a senha no primeiro login
-                await supabaseClient
-                    .from('operadores')
-                    .update({ deve_trocar_senha: true })
-                    .eq('id', novoOperador.id);
 
                 const {
                     data: modulosPerfil
@@ -344,21 +345,192 @@ formOperador.addEventListener('submit', async (event) => {
 
 
 // =====================================================
-// PERMISSÕES POR PERFIL
-// =====================================================
-// Define quais módulos cada PERFIL (admin, gerente,
-// operador, caixa, n1...) recebe por padrão. Usado também
-// para habilitar automaticamente os módulos de um novo
-// operador de acordo com o perfil escolhido no cadastro.
+// PERFIS (dinâmico, gerenciável pela tela)
 // =====================================================
 
-const PERFIS_DISPONIVEIS = [
-    { valor: 'operador', rotulo: 'Operador' },
-    { valor: 'gerente', rotulo: 'Gerente' },
-    { valor: 'caixa', rotulo: 'Caixa' },
-    { valor: 'n1', rotulo: 'N1' },
-    { valor: 'admin', rotulo: 'Administrador' }
-];
+let perfisCache = [];
+
+
+async function carregarPerfis() {
+
+    const { data, error } = await supabaseClient
+        .from('perfis')
+        .select('*')
+        .order('rotulo');
+
+    if (error) {
+        console.error('Erro ao carregar perfis:', error);
+        return;
+    }
+
+    perfisCache = data || [];
+
+    popularSelectPerfil(document.getElementById('perfilOperador'));
+    popularSelectPerfil(document.getElementById('editarPerfil'));
+}
+
+
+function popularSelectPerfil(selectElement, valorSelecionado) {
+
+    if (!selectElement) return;
+
+    selectElement.innerHTML = perfisCache.map(
+        p => `<option value="${p.valor}">${p.rotulo}</option>`
+    ).join('');
+
+    if (valorSelecionado) {
+        selectElement.value = valorSelecionado;
+    }
+}
+
+
+// =====================================================
+// GERENCIAR PERFIS (criar / excluir)
+// =====================================================
+
+function abrirGerenciarPerfis() {
+
+    document.getElementById('modalGerenciarPerfis').style.display = 'flex';
+    travarRolagemFundo();
+
+    renderizarListaPerfisGerenciar();
+}
+
+function fecharGerenciarPerfis() {
+
+    document.getElementById('modalGerenciarPerfis').style.display = 'none';
+    liberarRolagemFundo();
+}
+
+document.getElementById('btnGerenciarPerfis').addEventListener('click', abrirGerenciarPerfis);
+
+
+function renderizarListaPerfisGerenciar() {
+
+    const lista = document.getElementById('listaPerfisGerenciar');
+
+    if (perfisCache.length === 0) {
+        lista.innerHTML = '<p style="color:#6b7280; font-size:13px;">Nenhum perfil cadastrado.</p>';
+        return;
+    }
+
+    lista.innerHTML = '';
+
+    perfisCache.forEach(perfil => {
+
+        const item = document.createElement('div');
+
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#f9fafb; border-radius:8px; font-size:14px;';
+
+        item.innerHTML = `
+            <span></span>
+            <button type="button" class="btn-acao-excluir" style="background:#fde8e8; color:#b42318; border:none; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;">
+                Excluir
+            </button>
+        `;
+
+        item.querySelector('span').textContent = perfil.rotulo;
+
+        item.querySelector('button').addEventListener('click', () => excluirPerfil(perfil));
+
+        lista.appendChild(item);
+    });
+}
+
+
+function gerarSlugPerfil(nome) {
+
+    return nome
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // remove acentos
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+}
+
+
+document.getElementById('formNovoPerfil').addEventListener('submit', async (evento) => {
+
+    evento.preventDefault();
+
+    const input = document.getElementById('nomeNovoPerfil');
+    const rotulo = input.value.trim();
+
+    if (!rotulo) return;
+
+    const valor = gerarSlugPerfil(rotulo);
+
+    if (!valor) {
+        alert('Digite um nome válido para o perfil.');
+        return;
+    }
+
+    if (perfisCache.some(p => p.valor === valor)) {
+        alert('Já existe um perfil com esse nome.');
+        return;
+    }
+
+    try {
+
+        const { error } = await supabaseClient
+            .from('perfis')
+            .insert({ valor, rotulo });
+
+        if (error) throw error;
+
+        await registrarAuditoria('acao', `Criou o perfil "${rotulo}".`);
+
+        input.value = '';
+
+        await carregarPerfis();
+
+        renderizarListaPerfisGerenciar();
+
+    } catch (erro) {
+
+        console.error('Erro ao criar perfil:', erro);
+        alert('Não foi possível criar o perfil.\n\nDetalhes: ' + (erro.message || JSON.stringify(erro)));
+    }
+});
+
+
+async function excluirPerfil(perfil) {
+
+    if (!confirm(`Excluir o perfil "${perfil.rotulo}"?\n\nOperadores que já tiverem esse perfil não serão afetados, mas ele deixará de aparecer nas listas.`)) {
+        return;
+    }
+
+    try {
+
+        const { error } = await supabaseClient
+            .from('perfis')
+            .delete()
+            .eq('id', perfil.id);
+
+        if (error) throw error;
+
+        await registrarAuditoria('acao', `Excluiu o perfil "${perfil.rotulo}".`);
+
+        await carregarPerfis();
+
+        renderizarListaPerfisGerenciar();
+
+    } catch (erro) {
+
+        console.error('Erro ao excluir perfil:', erro);
+        alert('Não foi possível excluir o perfil.');
+    }
+}
+
+
+// =====================================================
+// PERMISSÕES POR PERFIL
+// =====================================================
+// Define quais módulos cada PERFIL recebe por padrão. Usado
+// também para habilitar automaticamente os módulos de um
+// novo operador de acordo com o perfil escolhido no cadastro.
+// =====================================================
 
 let perfilPermissaoAtual = null;
 
@@ -373,9 +545,7 @@ function abrirPermissoesPerfil() {
 
     const seletor = document.getElementById('seletorPerfilPermissao');
 
-    seletor.innerHTML = PERFIS_DISPONIVEIS.map(
-        p => `<option value="${p.valor}">${p.rotulo}</option>`
-    ).join('');
+    popularSelectPerfil(seletor);
 
     perfilPermissaoAtual = seletor.value;
 
@@ -1070,6 +1240,11 @@ async function resetarSenhaOperador(
 
     try {
 
+        console.log(
+            'Resetando senha do operador:',
+            operadorId
+        );
+
         const {
             data: resposta,
             error
@@ -1080,6 +1255,16 @@ async function resetarSenhaOperador(
                     operador_id: operadorId
                 }
             }
+        );
+
+        console.log(
+            'Resposta resetar senha:',
+            resposta
+        );
+
+        console.log(
+            'Erro resetar senha:',
+            error
         );
 
         if (error) {
@@ -1127,16 +1312,9 @@ async function resetarSenhaOperador(
             `Redefiniu a senha do operador "${nomeOperador}".`
         );
 
-        // Marca que esse operador precisa trocar a senha no próximo login
-        await supabaseClient
-            .from('operadores')
-            .update({ deve_trocar_senha: true })
-            .eq('id', operadorId);
-
         alert(
             `Senha de ${nomeOperador} redefinida com sucesso!\n\n` +
-            `Nova senha: 123456\n\n` +
-            `O operador será obrigado a trocar essa senha no próximo login.`
+            `Nova senha: 123456`
         );
 
     } catch (erro) {
