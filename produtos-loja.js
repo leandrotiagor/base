@@ -26,6 +26,14 @@ const btnSalvarProduto = document.getElementById('btnSalvarProduto');
 let fotoAtualUrl = null;
 let arquivoFotoSelecionado = null;
 
+const btnUsarCelular = document.getElementById('btnUsarCelular');
+const modalQrCode = document.getElementById('modalQrCode');
+const imagemQrCode = document.getElementById('imagemQrCode');
+const statusQrCode = document.getElementById('statusQrCode');
+const btnFecharQrCode = document.getElementById('btnFecharQrCode');
+
+let intervaloVerificacaoQr = null;
+
 
 // =====================================================
 // VERIFICA LOGIN
@@ -179,6 +187,7 @@ function abrirEdicaoProduto(produto) {
 function fecharModalProduto() {
     modalProduto.style.display = 'none';
     formProduto.reset();
+    pararVerificacaoQr();
 }
 
 btnNovoProduto.addEventListener('click', abrirNovoProduto);
@@ -364,6 +373,102 @@ async function excluirProduto(produto) {
         );
     }
 }
+
+
+// =====================================================
+// ENVIAR FOTO PELO CELULAR (QR CODE)
+// =====================================================
+
+function pararVerificacaoQr() {
+
+    if (intervaloVerificacaoQr) {
+        clearInterval(intervaloVerificacaoQr);
+        intervaloVerificacaoQr = null;
+    }
+}
+
+function fecharModalQrCode() {
+    pararVerificacaoQr();
+    modalQrCode.style.display = 'none';
+}
+
+btnFecharQrCode.addEventListener('click', fecharModalQrCode);
+
+btnUsarCelular.addEventListener('click', async () => {
+
+    try {
+
+        // Cria uma sessão de upload no banco
+        const { data: sessao, error } = await supabaseClient
+            .from('loja_upload_sessoes')
+            .insert({ status: 'aguardando' })
+            .select('id')
+            .single();
+
+        if (error || !sessao) {
+            throw error || new Error('Não foi possível criar a sessão.');
+        }
+
+        // Monta o link que vai dentro do QR Code (mesma origem do sistema)
+        const linkUpload =
+            `${window.location.origin}/loja-upload-foto.html?sessao=${sessao.id}`;
+
+        // Gera a imagem do QR Code (serviço público, só recebe o link acima)
+        imagemQrCode.src =
+            'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' +
+            encodeURIComponent(linkUpload);
+
+        statusQrCode.textContent = 'Aguardando foto...';
+        statusQrCode.style.color = '#168c8c';
+
+        modalQrCode.style.display = 'flex';
+
+        // Fica checando se a foto já chegou
+        pararVerificacaoQr();
+
+        intervaloVerificacaoQr = setInterval(async () => {
+
+            const { data: sessaoAtual, error: erroChecagem } =
+                await supabaseClient
+                    .from('loja_upload_sessoes')
+                    .select('status, foto_url')
+                    .eq('id', sessao.id)
+                    .single();
+
+            if (erroChecagem) {
+                return;
+            }
+
+            if (sessaoAtual.status === 'concluido' && sessaoAtual.foto_url) {
+
+                pararVerificacaoQr();
+
+                // Usa a foto recebida no formulário do produto
+                fotoAtualUrl = sessaoAtual.foto_url;
+                arquivoFotoSelecionado = null;
+                produtoFoto.value = '';
+
+                previaFoto.src = fotoAtualUrl;
+                previaFoto.style.display = 'block';
+
+                statusQrCode.textContent = '✅ Foto recebida!';
+                statusQrCode.style.color = '#15803d';
+
+                setTimeout(fecharModalQrCode, 1200);
+            }
+
+        }, 2500);
+
+    } catch (erro) {
+
+        console.error('Erro ao gerar QR Code:', erro);
+
+        alert(
+            'Não foi possível gerar o QR Code.\n\n' +
+            (erro.message || 'Erro desconhecido.')
+        );
+    }
+});
 
 
 // =====================================================

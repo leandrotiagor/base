@@ -409,11 +409,25 @@
                 ></textarea>
 
                 <label for="produtoFoto">Foto do produto</label>
-                <input
-                    type="file"
-                    id="produtoFoto"
-                    accept="image/*"
-                >
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+
+                    <input
+                        type="file"
+                        id="produtoFoto"
+                        accept="image/*"
+                        style="flex:1; min-width:160px;"
+                    >
+
+                    <button
+                        type="button"
+                        id="btnUsarCelular"
+                        style="background:#111827; color:#fff; white-space:nowrap;"
+                    >
+                        📱 Usar celular
+                    </button>
+
+                </div>
 
                 <img id="previaFoto" class="previa-foto" alt="Prévia da foto">
 
@@ -435,6 +449,39 @@
                 </div>
 
             </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- MODAL QR CODE - ENVIAR FOTO PELO CELULAR -->
+    <div id="modalQrCode" class="modal" style="display:none;">
+
+        <div class="modal-conteudo" style="max-width:340px; text-align:center;">
+
+            <div class="modal-cabecalho">
+
+                <h2 style="font-size:18px;">📱 Enviar pelo celular</h2>
+
+                <button type="button" id="btnFecharQrCode">×</button>
+
+            </div>
+
+            <p style="color:#6b7280; font-size:13px; margin-top:-10px;">
+                Escaneie o QR Code com a câmera do celular pra tirar
+                ou escolher a foto por lá.
+            </p>
+
+            <img
+                id="imagemQrCode"
+                alt="QR Code para enviar foto"
+                style="width:220px; height:220px; margin:10px auto; display:block;"
+            >
+
+            <p id="statusQrCode" style="font-weight:bold; color:#168c8c; font-size:14px;">
+                Aguardando foto...
+            </p>
 
         </div>
 
