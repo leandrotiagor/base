@@ -146,6 +146,7 @@ const PAGINAS_MODULOS = {
     'Caixa': 'caixa.html',
     'Impressão': 'impressao.html',
     'Administração': 'admin.html',
+    'Loja Online': 'produtos-loja.html',
     'Auditoria': 'auditoria.html',
     'Dashboard': 'dashboard.html',
     'Escala de Cultos': 'escala-cultos.html',
