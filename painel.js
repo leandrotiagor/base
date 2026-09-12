@@ -151,7 +151,8 @@ const PAGINAS_MODULOS = {
     'Escala de Cultos': 'escala-cultos.html',
     'Assistente IA': 'assistente-ia.html',
     'Transcrever Foto': 'transcrever-foto.html',
-    'Credencial de Membros': 'credencial-membros.html'
+    'Credencial de Membros': 'credencial-membros.html',
+    'Carnê de Contribuição': 'carne-contribuicao.html'
 };
 
 if (PAGINAS_MODULOS[modulo.nome]) {
