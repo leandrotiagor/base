@@ -5,7 +5,7 @@
 // ⚠️ IMPORTANTE: troque pelo número de WhatsApp da loja
 // Formato: código do país + DDD + número, só dígitos.
 // Exemplo (Brasil, DDD 38): '553899999999'
-const WHATSAPP_NUMERO = '5538900000000';
+const WHATSAPP_NUMERO = '5538984062019';
 
 const gridVitrine = document.getElementById('gridVitrine');
 const campoBusca = document.getElementById('campoBusca');
