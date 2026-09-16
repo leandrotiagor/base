@@ -3,259 +3,339 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enviar Foto do Produto - LT Sistemas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <title>Enviar fotos do produto</title>
 
-<style>
+    <meta name="theme-color" content="#168c8c">
 
-    * { box-sizing: border-box; }
+    <style>
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f7fa;
-        color: #1f2937;
-        min-height: 100vh;
-        min-height: 100dvh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
+        * { box-sizing: border-box; }
 
-    .card {
-        background: white;
-        border-radius: 14px;
-        padding: 30px 26px;
-        max-width: 420px;
-        width: 100%;
-        text-align: center;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+            padding: 20px 16px 40px;
+        }
 
-    h1 {
-        font-size: 20px;
-        margin: 0 0 10px;
-    }
+        .caixa {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px 18px 26px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        }
 
-    p {
-        color: #6b7280;
-        font-size: 14px;
-        margin-bottom: 22px;
-    }
+        h1 { font-size: 20px; margin: 0 0 6px; }
 
-    input[type="file"] {
-        display: none;
-    }
+        p.ajuda { color: #6b7280; font-size: 14px; margin: 0 0 18px; }
 
-    label.btn-camera {
-        display: block;
-        background: #168c8c;
-        color: #fff;
-        font-weight: bold;
-        padding: 16px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 15px;
-    }
+        .botao {
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
 
-    #preview {
-        display: none;
-        width: 100%;
-        max-height: 320px;
-        object-fit: contain;
-        border-radius: 10px;
-        margin: 18px 0;
-    }
+        .botao.principal { background: #168c8c; color: #fff; }
+        .botao.escuro    { background: #111827; color: #fff; }
+        .botao.leve      { background: #e5e7eb; color: #111827; }
+        .botao:disabled  { opacity: .55; }
 
-    .btn-enviar {
-        display: none;
-        width: 100%;
-        background: #111827;
-        color: #fff;
-        font-weight: bold;
-        padding: 14px;
-        border: none;
-        border-radius: 10px;
-        font-size: 15px;
-        cursor: pointer;
-        margin-top: 12px;
-    }
+        .fotos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0 6px;
+        }
 
-    .btn-trocar {
-        display: none;
-        width: 100%;
-        background: transparent;
-        color: #6b7280;
-        border: none;
-        padding: 10px;
-        font-size: 13px;
-        cursor: pointer;
-        text-decoration: underline;
-    }
+        .foto {
+            position: relative;
+            width: 88px;
+            height: 88px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #eef1f4;
+            border: 1px solid #e5e7eb;
+        }
 
-    .estado-mensagem {
-        font-size: 15px;
-        font-weight: bold;
-        margin-top: 10px;
-    }
+        .foto img { width: 100%; height: 100%; object-fit: cover; }
 
-    .icone-grande {
-        font-size: 48px;
-        margin-bottom: 14px;
-    }
+        .foto .barra {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .75);
+            font-size: 12px;
+            color: #168c8c;
+            font-weight: bold;
+        }
 
-</style>
+        .contador { font-size: 13px; color: #6b7280; margin: 4px 0 16px; }
+
+        .aviso {
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .aviso.ok   { background: #dcfce7; color: #15803d; }
+        .aviso.erro { background: #fde8e8; color: #b42318; }
+
+    </style>
 
 </head>
 
 <body>
 
-    <div class="card" id="card">
-        <div class="icone-grande">📷</div>
-        <h1>Enviar foto do produto</h1>
-        <p id="textoInstrucao">Tire uma foto ou escolha uma da galeria.</p>
+    <div class="caixa">
 
-        <label class="btn-camera" id="btnCamera" for="inputFoto">
-            📷 Tirar / escolher foto
-        </label>
+        <h1>📷 Fotos do produto</h1>
 
-        <input type="file" id="inputFoto" accept="image/*" capture="environment">
+        <p class="ajuda" id="ajuda">
+            Tire as fotos ou escolha da galeria. Elas aparecem no computador
+            automaticamente.
+        </p>
 
-        <img id="preview" alt="Prévia da foto selecionada">
+        <div id="aviso"></div>
 
-        <button class="btn-enviar" id="btnEnviar" type="button">Confirmar e enviar</button>
-        <button class="btn-trocar" id="btnTrocar" type="button">Escolher outra foto</button>
+        <div id="area">
+
+            <button type="button" class="botao principal" id="btnCamera">
+                Tirar foto agora
+            </button>
+
+            <button type="button" class="botao escuro" id="btnGaleria">
+                Escolher da galeria
+            </button>
+
+            <div class="fotos" id="fotos"></div>
+
+            <p class="contador" id="contador">Nenhuma foto enviada ainda.</p>
+
+            <button type="button" class="botao leve" id="btnConcluir">
+                Concluir envio
+            </button>
+
+        </div>
+
+        <input type="file" id="entradaCamera"  accept="image/*" capture="environment" hidden>
+        <input type="file" id="entradaGaleria" accept="image/*" multiple hidden>
 
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
 
-<script>
+    <script>
 
-    const parametros = new URLSearchParams(window.location.search);
-    const sessaoId = parametros.get('sessao');
+        const BUCKET_FOTOS = 'loja-fotos';
 
-    const card = document.getElementById('card');
-    const textoInstrucao = document.getElementById('textoInstrucao');
-    const btnCamera = document.getElementById('btnCamera');
-    const inputFoto = document.getElementById('inputFoto');
-    const preview = document.getElementById('preview');
-    const btnEnviar = document.getElementById('btnEnviar');
-    const btnTrocar = document.getElementById('btnTrocar');
+        const parametros = new URLSearchParams(window.location.search);
+        const sessaoId = parametros.get('sessao');
+        const maximo = Math.min(Number(parametros.get('max')) || 5, 5);
 
-    let arquivoSelecionado = null;
+        const areaEl = document.getElementById('area');
+        const avisoEl = document.getElementById('aviso');
+        const fotosEl = document.getElementById('fotos');
+        const contadorEl = document.getElementById('contador');
 
-    function mostrarMensagemFinal(icone, titulo, texto) {
-        card.innerHTML = `
-            <div class="icone-grande">${icone}</div>
-            <h1>${titulo}</h1>
-            <p class="estado-mensagem">${texto}</p>
-        `;
-    }
+        const btnCamera = document.getElementById('btnCamera');
+        const btnGaleria = document.getElementById('btnGaleria');
+        const btnConcluir = document.getElementById('btnConcluir');
 
-    if (!sessaoId) {
-        mostrarMensagemFinal('⚠️', 'Link inválido', 'Gere um novo QR Code pelo sistema.');
-    }
+        const entradaCamera = document.getElementById('entradaCamera');
+        const entradaGaleria = document.getElementById('entradaGaleria');
 
-    inputFoto.addEventListener('change', () => {
+        let fotosEnviadas = [];
 
-        const arquivo = inputFoto.files[0];
+        function mostrarAviso(texto, tipo) {
+            avisoEl.innerHTML =
+                '<div class="aviso ' + tipo + '">' + texto + '</div>';
+        }
 
-        if (!arquivo) return;
+        function desenhar() {
 
-        arquivoSelecionado = arquivo;
+            fotosEl.innerHTML = fotosEnviadas
+                .map((url) => '<div class="foto"><img src="' + url + '" alt=""></div>')
+                .join('');
 
-        const leitor = new FileReader();
-        leitor.onload = (evento) => {
-            preview.src = evento.target.result;
-            preview.style.display = 'block';
-            btnEnviar.style.display = 'block';
-            btnTrocar.style.display = 'block';
-            btnCamera.style.display = 'none';
-            textoInstrucao.textContent = 'Confira a foto antes de enviar.';
-        };
-        leitor.readAsDataURL(arquivo);
-    });
+            contadorEl.textContent = fotosEnviadas.length
+                ? fotosEnviadas.length + ' de ' + maximo + ' foto(s) enviada(s).'
+                : 'Nenhuma foto enviada ainda.';
 
-    btnTrocar.addEventListener('click', () => {
-        inputFoto.value = '';
-        preview.style.display = 'none';
-        btnEnviar.style.display = 'none';
-        btnTrocar.style.display = 'none';
-        btnCamera.style.display = 'block';
-        textoInstrucao.textContent = 'Tire uma foto ou escolha uma da galeria.';
-    });
+            const cheio = fotosEnviadas.length >= maximo;
+            btnCamera.disabled = cheio;
+            btnGaleria.disabled = cheio;
+        }
 
-    btnEnviar.addEventListener('click', async () => {
+        function marcarEnviando(quantidade) {
+            for (let i = 0; i < quantidade; i++) {
+                const div = document.createElement('div');
+                div.className = 'foto';
+                div.innerHTML = '<div class="barra">enviando…</div>';
+                fotosEl.appendChild(div);
+            }
+        }
 
-        if (!arquivoSelecionado || !sessaoId) return;
+        async function enviarArquivo(arquivo) {
 
-        btnEnviar.disabled = true;
-        btnEnviar.textContent = 'Enviando...';
+            const extensao = (arquivo.name.split('.').pop() || 'jpg').toLowerCase();
 
-        try {
+            const nome = 'produto_' + Date.now() + '_' +
+                Math.random().toString(36).slice(2) + '.' + extensao;
 
-            const extensao =
-                (arquivoSelecionado.name.split('.').pop() || 'jpg').toLowerCase();
-
-            const nomeArquivo = `celular_${sessaoId}.${extensao}`;
-
-            const { error: erroUpload } = await supabaseClient
+            const { error } = await supabaseClient
                 .storage
-                .from('loja-fotos')
-                .upload(nomeArquivo, arquivoSelecionado, {
-                    cacheControl: '3600',
-                    upsert: true
-                });
+                .from(BUCKET_FOTOS)
+                .upload(nome, arquivo, { cacheControl: '3600', upsert: false });
 
-            if (erroUpload) {
-                throw erroUpload;
+            if (error) {
+                throw error;
             }
 
-            const { data: dadosPublicos } = supabaseClient
+            const { data } = supabaseClient
                 .storage
-                .from('loja-fotos')
-                .getPublicUrl(nomeArquivo);
+                .from(BUCKET_FOTOS)
+                .getPublicUrl(nome);
 
-            const { error: erroSessao } = await supabaseClient
+            return data.publicUrl;
+        }
+
+        async function salvarNaSessao() {
+
+            const { error } = await supabaseClient
                 .from('loja_upload_sessoes')
                 .update({
-                    status: 'concluido',
-                    foto_url: dadosPublicos.publicUrl
+                    fotos: fotosEnviadas,
+                    foto_url: fotosEnviadas[0] || null,
+                    status: 'aguardando'
                 })
                 .eq('id', sessaoId);
 
-            if (erroSessao) {
-                throw erroSessao;
+            if (error) {
+                throw error;
+            }
+        }
+
+        async function processar(arquivos) {
+
+            const lista = Array.from(arquivos || []);
+
+            if (!lista.length) {
+                return;
             }
 
-            mostrarMensagemFinal(
-                '✅',
-                'Foto enviada!',
-                'Pode fechar essa aba e voltar pro computador — a foto já vai aparecer lá.'
-            );
+            const espaco = maximo - fotosEnviadas.length;
 
-        } catch (erro) {
+            if (espaco <= 0) {
+                mostrarAviso('Limite de ' + maximo + ' fotos atingido.', 'erro');
+                return;
+            }
 
-            console.error('Erro ao enviar foto:', erro);
+            const selecionados = lista.slice(0, espaco);
 
-            mostrarMensagemFinal(
-                '❌',
-                'Erro ao enviar',
-                erro.message || 'Verifique sua internet e tente novamente.'
-            );
+            avisoEl.innerHTML = '';
+            marcarEnviando(selecionados.length);
 
-            btnEnviar.disabled = false;
-            btnEnviar.textContent = 'Confirmar e enviar';
+            try {
+
+                for (const arquivo of selecionados) {
+                    const url = await enviarArquivo(arquivo);
+                    fotosEnviadas.push(url);
+                    await salvarNaSessao();
+                    desenhar();
+                }
+
+                mostrarAviso('Foto(s) enviada(s). Já apareceram no computador.', 'ok');
+
+            } catch (erro) {
+
+                console.error(erro);
+                desenhar();
+                mostrarAviso(
+                    'Não foi possível enviar: ' + (erro.message || 'erro desconhecido'),
+                    'erro'
+                );
+            }
         }
-    });
 
-</script>
+        btnCamera.addEventListener('click', () => entradaCamera.click());
+        btnGaleria.addEventListener('click', () => entradaGaleria.click());
+
+        entradaCamera.addEventListener('change', async (e) => {
+            await processar(e.target.files);
+            entradaCamera.value = '';
+        });
+
+        entradaGaleria.addEventListener('change', async (e) => {
+            await processar(e.target.files);
+            entradaGaleria.value = '';
+        });
+
+        btnConcluir.addEventListener('click', async () => {
+
+            btnConcluir.disabled = true;
+            btnConcluir.textContent = 'Finalizando...';
+
+            try {
+
+                const { error } = await supabaseClient
+                    .from('loja_upload_sessoes')
+                    .update({
+                        fotos: fotosEnviadas,
+                        foto_url: fotosEnviadas[0] || null,
+                        status: 'concluido'
+                    })
+                    .eq('id', sessaoId);
+
+                if (error) {
+                    throw error;
+                }
+
+                areaEl.innerHTML = '';
+                document.getElementById('ajuda').textContent =
+                    'Pode fechar esta página e continuar o cadastro no computador.';
+                mostrarAviso('✅ Envio concluído!', 'ok');
+
+            } catch (erro) {
+
+                console.error(erro);
+                btnConcluir.disabled = false;
+                btnConcluir.textContent = 'Concluir envio';
+                mostrarAviso(
+                    'Não foi possível finalizar: ' + (erro.message || 'erro'),
+                    'erro'
+                );
+            }
+        });
+
+        // início
+        (function iniciar() {
+
+            if (!sessaoId) {
+                areaEl.innerHTML = '';
+                mostrarAviso('Link inválido. Gere o QR Code novamente no sistema.', 'erro');
+                return;
+            }
+
+            desenhar();
+        })();
+
+    </script>
 
 </body>
 

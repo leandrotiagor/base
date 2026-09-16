@@ -110,11 +110,39 @@
             flex-direction: column;
         }
 
+        .produto-capa {
+            position: relative;
+        }
+
         .produto-foto {
             width: 100%;
             aspect-ratio: 1 / 1;
             object-fit: cover;
             background: #eef1f4;
+            display: block;
+        }
+
+        .selo-fotos {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            background: rgba(17, 24, 39, 0.8);
+            color: #fff;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+        }
+
+        .selo-vendido {
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            background: #b42318;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 999px;
         }
 
         .produto-info {
@@ -136,6 +164,11 @@
             color: #168c8c;
             font-weight: bold;
             font-size: 16px;
+        }
+
+        .produto-categoria {
+            font-size: 12px;
+            color: #6b7280;
         }
 
         .produto-status {
@@ -226,6 +259,7 @@
         }
 
         #formProduto input,
+        #formProduto select,
         #formProduto textarea {
             width: 100%;
             padding: 11px;
@@ -233,6 +267,7 @@
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
+            background: #fff;
         }
 
         #formProduto textarea {
@@ -241,19 +276,90 @@
         }
 
         #formProduto input:focus,
+        #formProduto select:focus,
         #formProduto textarea:focus {
             outline: none;
             border-color: #168c8c;
         }
 
-        .previa-foto {
-            width: 140px;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 10px;
+        .linha-dupla {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* FOTOS */
+        .fotos-lista {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-top: 10px;
-            display: none;
+        }
+
+        .foto-item {
+            position: relative;
+            width: 92px;
+            height: 92px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
             background: #eef1f4;
+        }
+
+        .foto-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .foto-item .capa {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: rgba(22, 140, 140, 0.9);
+            color: #fff;
+            font-size: 10px;
+            text-align: center;
+            padding: 2px 0;
+        }
+
+        .foto-item .remover {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            font-size: 14px;
+            line-height: 1;
+            padding: 0;
+            display: grid;
+            place-items: center;
+        }
+
+        .foto-item .mover {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111827;
+            font-size: 12px;
+            line-height: 1;
+            padding: 0;
+            display: grid;
+            place-items: center;
+        }
+
+        .contador-fotos {
+            font-size: 12px;
+            color: #6b7280;
+            margin: 8px 0 0;
         }
 
         .checkbox {
@@ -285,6 +391,11 @@
             color: white;
         }
 
+        .btn-salvar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         @media (max-width: 700px) {
 
             header {
@@ -306,6 +417,10 @@
                 width: 100%;
                 justify-content: center;
                 text-align: center;
+            }
+
+            .linha-dupla {
+                grid-template-columns: 1fr;
             }
 
         }
@@ -392,15 +507,32 @@
                     required
                 >
 
-                <label for="produtoPreco">Preço (R$)</label>
-                <input
-                    type="number"
-                    id="produtoPreco"
-                    step="0.01"
-                    min="0"
-                    placeholder="0,00"
-                    required
-                >
+                <div class="linha-dupla">
+
+                    <div>
+                        <label for="produtoPreco">Preço (R$)</label>
+                        <input
+                            type="number"
+                            id="produtoPreco"
+                            step="0.01"
+                            min="0"
+                            placeholder="0,00"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="produtoCategoria">Categoria</label>
+                        <select id="produtoCategoria"></select>
+                    </div>
+
+                </div>
+
+                <label for="produtoStatus">Situação da venda</label>
+                <select id="produtoStatus">
+                    <option value="disponivel">Disponível</option>
+                    <option value="vendido">Vendido</option>
+                </select>
 
                 <label for="produtoDescricao">Descrição</label>
                 <textarea
@@ -408,7 +540,7 @@
                     placeholder="Detalhes, estado de conservação, cor, tamanho..."
                 ></textarea>
 
-                <label for="produtoFoto">Foto do produto</label>
+                <label>Fotos do produto (até 5)</label>
 
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
 
@@ -416,6 +548,7 @@
                         type="file"
                         id="produtoFoto"
                         accept="image/*"
+                        multiple
                         style="flex:1; min-width:160px;"
                     >
 
@@ -429,7 +562,9 @@
 
                 </div>
 
-                <img id="previaFoto" class="previa-foto" alt="Prévia da foto">
+                <div id="listaFotos" class="fotos-lista"></div>
+
+                <p id="contadorFotos" class="contador-fotos">Nenhuma foto adicionada.</p>
 
                 <label class="checkbox">
                     <input type="checkbox" id="produtoAtivo" checked>
@@ -455,7 +590,7 @@
     </div>
 
 
-    <!-- MODAL QR CODE - ENVIAR FOTO PELO CELULAR -->
+    <!-- MODAL QR CODE - ENVIAR FOTOS PELO CELULAR -->
     <div id="modalQrCode" class="modal" style="display:none;">
 
         <div class="modal-conteudo" style="max-width:340px; text-align:center;">
@@ -469,19 +604,27 @@
             </div>
 
             <p style="color:#6b7280; font-size:13px; margin-top:-10px;">
-                Escaneie o QR Code com a câmera do celular pra tirar
-                ou escolher a foto por lá.
+                Escaneie o QR Code com a câmera do celular. As fotos que você
+                enviar por lá aparecem aqui na hora.
             </p>
 
             <img
                 id="imagemQrCode"
-                alt="QR Code para enviar foto"
+                alt="QR Code para enviar fotos"
                 style="width:220px; height:220px; margin:10px auto; display:block;"
             >
 
             <p id="statusQrCode" style="font-weight:bold; color:#168c8c; font-size:14px;">
-                Aguardando foto...
+                Aguardando fotos...
             </p>
+
+            <button
+                type="button"
+                id="btnConcluirQrCode"
+                style="background:#168c8c; color:#fff; width:100%;"
+            >
+                Concluir
+            </button>
 
         </div>
 
