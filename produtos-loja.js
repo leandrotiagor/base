@@ -1,8 +1,20 @@
 // =====================================================
 // LOJA ONLINE - Cadastro de produtos da vitrine pública
+// Versão com: categoria, status (disponível/vendido) e múltiplas fotos (até 5)
 // =====================================================
 
 const BUCKET_FOTOS = 'loja-fotos';
+const MAX_FOTOS = 5;
+
+const CATEGORIAS_BASE = [
+    'Roupas',
+    'Calçados',
+    'Eletrônicos',
+    'Móveis',
+    'Decoração',
+    'Brinquedos',
+    'Outros'
+];
 
 const gridProdutos = document.getElementById('gridProdutos');
 
@@ -13,9 +25,12 @@ const tituloModalProduto = document.getElementById('tituloModalProduto');
 const produtoId = document.getElementById('produtoId');
 const produtoTitulo = document.getElementById('produtoTitulo');
 const produtoPreco = document.getElementById('produtoPreco');
+const produtoCategoria = document.getElementById('produtoCategoria');
+const produtoStatus = document.getElementById('produtoStatus');
 const produtoDescricao = document.getElementById('produtoDescricao');
 const produtoFoto = document.getElementById('produtoFoto');
-const previaFoto = document.getElementById('previaFoto');
+const listaFotos = document.getElementById('listaFotos');
+const contadorFotos = document.getElementById('contadorFotos');
 const produtoAtivo = document.getElementById('produtoAtivo');
 
 const btnNovoProduto = document.getElementById('btnNovoProduto');
@@ -23,15 +38,20 @@ const btnFecharModalProduto = document.getElementById('btnFecharModalProduto');
 const btnCancelarProduto = document.getElementById('btnCancelarProduto');
 const btnSalvarProduto = document.getElementById('btnSalvarProduto');
 
-let fotoAtualUrl = null;
-let arquivoFotoSelecionado = null;
-
 const btnUsarCelular = document.getElementById('btnUsarCelular');
 const modalQrCode = document.getElementById('modalQrCode');
 const imagemQrCode = document.getElementById('imagemQrCode');
 const statusQrCode = document.getElementById('statusQrCode');
 const btnFecharQrCode = document.getElementById('btnFecharQrCode');
+const btnConcluirQrCode = document.getElementById('btnConcluirQrCode');
 
+let todosOsProdutosCache = [];
+
+// Lista de trabalho das fotos do produto que está sendo criado/editado.
+// Cada item: { tipo: 'existente' | 'novo', url, arquivo? }
+let fotosAtuais = [];
+
+let sessaoQrAtual = null;
 let intervaloVerificacaoQr = null;
 
 
@@ -74,25 +94,37 @@ async function carregarProdutos() {
         return;
     }
 
-    if (!produtos || produtos.length === 0) {
+    todosOsProdutosCache = produtos || [];
+
+    if (todosOsProdutosCache.length === 0) {
         gridProdutos.innerHTML = '<p class="mensagem">Nenhum produto cadastrado ainda.</p>';
         return;
     }
 
     gridProdutos.innerHTML = '';
 
-    produtos.forEach((produto) => {
+    todosOsProdutosCache.forEach((produto) => {
+
+        const fotos = Array.isArray(produto.fotos) ? produto.fotos : [];
+        const capa = fotos[0] || produto.foto_url || '';
+        const totalFotos = fotos.length || (produto.foto_url ? 1 : 0);
 
         const card = document.createElement('div');
         card.className = 'produto-card';
 
         card.innerHTML = `
-            <img class="produto-foto" src="${produto.foto_url || ''}" alt="${escaparHtml(produto.titulo)}"
-                 onerror="this.style.opacity='0.3'">
+            <div class="produto-capa">
+                <img class="produto-foto" src="${capa}" alt="${escaparHtml(produto.titulo)}"
+                     onerror="this.style.opacity='0.3'">
+                ${totalFotos > 1 ? `<span class="selo-fotos">📷 ${totalFotos}</span>` : ''}
+                ${produto.status === 'vendido' ? '<span class="selo-vendido">VENDIDO</span>' : ''}
+            </div>
 
             <div class="produto-info">
 
                 <div class="produto-titulo"></div>
+
+                ${produto.categoria ? `<div class="produto-categoria"></div>` : ''}
 
                 <div class="produto-preco"></div>
 
@@ -107,6 +139,11 @@ async function carregarProdutos() {
         `;
 
         card.querySelector('.produto-titulo').textContent = produto.titulo;
+
+        const categoriaEl = card.querySelector('.produto-categoria');
+        if (categoriaEl) {
+            categoriaEl.textContent = produto.categoria;
+        }
 
         card.querySelector('.produto-preco').textContent =
             formatarPreco(produto.preco);
@@ -141,6 +178,112 @@ function escaparHtml(texto) {
 
 
 // =====================================================
+// SELECT DE CATEGORIA
+// =====================================================
+
+function preencherSelectCategorias(categoriaSelecionada) {
+
+    const categoriasExistentes = todosOsProdutosCache
+        .map(p => p.categoria)
+        .filter(Boolean);
+
+    const todasCategorias = Array.from(
+        new Set([...CATEGORIAS_BASE, ...categoriasExistentes])
+    ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+    if (categoriaSelecionada && !todasCategorias.includes(categoriaSelecionada)) {
+        todasCategorias.push(categoriaSelecionada);
+    }
+
+    produtoCategoria.innerHTML = todasCategorias
+        .map(cat => `<option value="${escaparHtml(cat)}">${escaparHtml(cat)}</option>`)
+        .join('');
+
+    if (categoriaSelecionada) {
+        produtoCategoria.value = categoriaSelecionada;
+    }
+}
+
+
+// =====================================================
+// GERENCIAMENTO DAS FOTOS (LISTA DE TRABALHO)
+// =====================================================
+
+function renderizarFotos() {
+
+    listaFotos.innerHTML = '';
+
+    fotosAtuais.forEach((foto, indice) => {
+
+        const item = document.createElement('div');
+        item.className = 'foto-item';
+
+        item.innerHTML = `
+            <img src="${foto.url}" alt="Foto ${indice + 1}">
+            ${indice === 0 ? '<span class="capa">Capa</span>' : ''}
+            <button type="button" class="remover" title="Remover">×</button>
+            ${indice !== 0 ? '<button type="button" class="mover" title="Definir como capa">★</button>' : ''}
+        `;
+
+        item.querySelector('.remover').addEventListener('click', () => {
+            fotosAtuais.splice(indice, 1);
+            renderizarFotos();
+        });
+
+        const btnMover = item.querySelector('.mover');
+        if (btnMover) {
+            btnMover.addEventListener('click', () => {
+                const [selecionada] = fotosAtuais.splice(indice, 1);
+                fotosAtuais.unshift(selecionada);
+                renderizarFotos();
+            });
+        }
+
+        listaFotos.appendChild(item);
+    });
+
+    contadorFotos.textContent = fotosAtuais.length > 0
+        ? `${fotosAtuais.length} de ${MAX_FOTOS} fotos adicionadas.`
+        : 'Nenhuma foto adicionada.';
+}
+
+function adicionarFotosNovas(arquivos) {
+
+    const espacoDisponivel = MAX_FOTOS - fotosAtuais.length;
+
+    if (espacoDisponivel <= 0) {
+        alert(`Você já atingiu o limite de ${MAX_FOTOS} fotos.`);
+        return;
+    }
+
+    const arquivosAceitos = Array.from(arquivos).slice(0, espacoDisponivel);
+
+    if (arquivos.length > arquivosAceitos.length) {
+        alert(`Só é possível adicionar mais ${espacoDisponivel} foto(s). O restante foi ignorado.`);
+    }
+
+    arquivosAceitos.forEach((arquivo) => {
+        fotosAtuais.push({
+            tipo: 'novo',
+            arquivo,
+            url: URL.createObjectURL(arquivo)
+        });
+    });
+
+    renderizarFotos();
+}
+
+produtoFoto.addEventListener('change', () => {
+
+    if (produtoFoto.files && produtoFoto.files.length > 0) {
+        adicionarFotosNovas(produtoFoto.files);
+    }
+
+    produtoFoto.value = '';
+});
+
+
+// =====================================================
 // MODAL - ABRIR / FECHAR
 // =====================================================
 
@@ -149,10 +292,13 @@ function abrirNovoProduto() {
     formProduto.reset();
 
     produtoId.value = '';
-    fotoAtualUrl = null;
-    arquivoFotoSelecionado = null;
-    previaFoto.style.display = 'none';
+    fotosAtuais = [];
+    renderizarFotos();
+
     produtoAtivo.checked = true;
+    produtoStatus.value = 'disponivel';
+
+    preencherSelectCategorias();
 
     tituloModalProduto.textContent = '➕ Novo produto';
 
@@ -168,16 +314,16 @@ function abrirEdicaoProduto(produto) {
     produtoPreco.value = produto.preco || '';
     produtoDescricao.value = produto.descricao || '';
     produtoAtivo.checked = !!produto.ativo;
+    produtoStatus.value = produto.status || 'disponivel';
 
-    fotoAtualUrl = produto.foto_url || null;
-    arquivoFotoSelecionado = null;
+    preencherSelectCategorias(produto.categoria || '');
 
-    if (fotoAtualUrl) {
-        previaFoto.src = fotoAtualUrl;
-        previaFoto.style.display = 'block';
-    } else {
-        previaFoto.style.display = 'none';
-    }
+    const fotosExistentes = Array.isArray(produto.fotos) && produto.fotos.length > 0
+        ? produto.fotos
+        : (produto.foto_url ? [produto.foto_url] : []);
+
+    fotosAtuais = fotosExistentes.map(url => ({ tipo: 'existente', url }));
+    renderizarFotos();
 
     tituloModalProduto.textContent = 'Editar produto';
 
@@ -187,38 +333,13 @@ function abrirEdicaoProduto(produto) {
 function fecharModalProduto() {
     modalProduto.style.display = 'none';
     formProduto.reset();
-    pararVerificacaoQr();
+    fotosAtuais = [];
+    fecharModalQrCode();
 }
 
 btnNovoProduto.addEventListener('click', abrirNovoProduto);
 btnFecharModalProduto.addEventListener('click', fecharModalProduto);
 btnCancelarProduto.addEventListener('click', fecharModalProduto);
-
-
-// =====================================================
-// PRÉVIA DA FOTO SELECIONADA
-// =====================================================
-
-produtoFoto.addEventListener('change', () => {
-
-    const arquivo = produtoFoto.files[0];
-
-    if (!arquivo) {
-        arquivoFotoSelecionado = null;
-        return;
-    }
-
-    arquivoFotoSelecionado = arquivo;
-
-    const leitor = new FileReader();
-
-    leitor.onload = (evento) => {
-        previaFoto.src = evento.target.result;
-        previaFoto.style.display = 'block';
-    };
-
-    leitor.readAsDataURL(arquivo);
-});
 
 
 // =====================================================
@@ -266,17 +387,27 @@ formProduto.addEventListener('submit', async (evento) => {
 
     try {
 
-        let urlFoto = fotoAtualUrl;
+        // Envia pro storage só as fotos novas (as "existentes" já têm URL)
+        const urlsFinais = [];
 
-        if (arquivoFotoSelecionado) {
-            urlFoto = await enviarFotoProduto(arquivoFotoSelecionado);
+        for (const foto of fotosAtuais) {
+
+            if (foto.tipo === 'existente') {
+                urlsFinais.push(foto.url);
+            } else {
+                const urlEnviada = await enviarFotoProduto(foto.arquivo);
+                urlsFinais.push(urlEnviada);
+            }
         }
 
         const dadosProduto = {
             titulo: produtoTitulo.value.trim(),
             preco: parseFloat(produtoPreco.value) || 0,
+            categoria: produtoCategoria.value || null,
+            status: produtoStatus.value || 'disponivel',
             descricao: produtoDescricao.value.trim(),
-            foto_url: urlFoto,
+            fotos: urlsFinais,
+            foto_url: urlsFinais[0] || null,
             ativo: produtoAtivo.checked
         };
 
@@ -376,7 +507,7 @@ async function excluirProduto(produto) {
 
 
 // =====================================================
-// ENVIAR FOTO PELO CELULAR (QR CODE)
+// ENVIAR FOTOS PELO CELULAR (QR CODE) - aceita várias seguidas
 // =====================================================
 
 function pararVerificacaoQr() {
@@ -389,75 +520,97 @@ function pararVerificacaoQr() {
 
 function fecharModalQrCode() {
     pararVerificacaoQr();
+    sessaoQrAtual = null;
     modalQrCode.style.display = 'none';
 }
 
 btnFecharQrCode.addEventListener('click', fecharModalQrCode);
+btnConcluirQrCode.addEventListener('click', fecharModalQrCode);
+
+async function gerarNovaSessaoQr() {
+
+    const { data: sessao, error } = await supabaseClient
+        .from('loja_upload_sessoes')
+        .insert({ status: 'aguardando' })
+        .select('id')
+        .single();
+
+    if (error || !sessao) {
+        throw error || new Error('Não foi possível criar a sessão.');
+    }
+
+    sessaoQrAtual = sessao.id;
+
+    const linkUpload =
+        `${window.location.origin}/loja-upload-foto.html?sessao=${sessao.id}`;
+
+    imagemQrCode.src =
+        'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' +
+        encodeURIComponent(linkUpload);
+
+    statusQrCode.textContent = 'Aguardando foto...';
+    statusQrCode.style.color = '#168c8c';
+
+    pararVerificacaoQr();
+
+    intervaloVerificacaoQr = setInterval(async () => {
+
+        if (!sessaoQrAtual) {
+            return;
+        }
+
+        const { data: sessaoAtual, error: erroChecagem } =
+            await supabaseClient
+                .from('loja_upload_sessoes')
+                .select('status, foto_url')
+                .eq('id', sessaoQrAtual)
+                .single();
+
+        if (erroChecagem) {
+            return;
+        }
+
+        if (sessaoAtual.status === 'concluido' && sessaoAtual.foto_url) {
+
+            pararVerificacaoQr();
+
+            fotosAtuais.push({
+                tipo: 'existente',
+                url: sessaoAtual.foto_url
+            });
+
+            renderizarFotos();
+
+            if (fotosAtuais.length >= MAX_FOTOS) {
+
+                statusQrCode.textContent = `✅ Limite de ${MAX_FOTOS} fotos atingido!`;
+                statusQrCode.style.color = '#15803d';
+
+                setTimeout(fecharModalQrCode, 1500);
+
+            } else {
+
+                statusQrCode.textContent = '✅ Foto recebida! Pode enviar outra ou concluir.';
+                statusQrCode.style.color = '#15803d';
+
+                await gerarNovaSessaoQr();
+            }
+        }
+
+    }, 2500);
+}
 
 btnUsarCelular.addEventListener('click', async () => {
 
+    if (fotosAtuais.length >= MAX_FOTOS) {
+        alert(`Você já atingiu o limite de ${MAX_FOTOS} fotos.`);
+        return;
+    }
+
     try {
 
-        // Cria uma sessão de upload no banco
-        const { data: sessao, error } = await supabaseClient
-            .from('loja_upload_sessoes')
-            .insert({ status: 'aguardando' })
-            .select('id')
-            .single();
-
-        if (error || !sessao) {
-            throw error || new Error('Não foi possível criar a sessão.');
-        }
-
-        // Monta o link que vai dentro do QR Code (mesma origem do sistema)
-        const linkUpload =
-            `${window.location.origin}/loja-upload-foto.html?sessao=${sessao.id}`;
-
-        // Gera a imagem do QR Code (serviço público, só recebe o link acima)
-        imagemQrCode.src =
-            'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' +
-            encodeURIComponent(linkUpload);
-
-        statusQrCode.textContent = 'Aguardando foto...';
-        statusQrCode.style.color = '#168c8c';
-
         modalQrCode.style.display = 'flex';
-
-        // Fica checando se a foto já chegou
-        pararVerificacaoQr();
-
-        intervaloVerificacaoQr = setInterval(async () => {
-
-            const { data: sessaoAtual, error: erroChecagem } =
-                await supabaseClient
-                    .from('loja_upload_sessoes')
-                    .select('status, foto_url')
-                    .eq('id', sessao.id)
-                    .single();
-
-            if (erroChecagem) {
-                return;
-            }
-
-            if (sessaoAtual.status === 'concluido' && sessaoAtual.foto_url) {
-
-                pararVerificacaoQr();
-
-                // Usa a foto recebida no formulário do produto
-                fotoAtualUrl = sessaoAtual.foto_url;
-                arquivoFotoSelecionado = null;
-                produtoFoto.value = '';
-
-                previaFoto.src = fotoAtualUrl;
-                previaFoto.style.display = 'block';
-
-                statusQrCode.textContent = '✅ Foto recebida!';
-                statusQrCode.style.color = '#15803d';
-
-                setTimeout(fecharModalQrCode, 1200);
-            }
-
-        }, 2500);
+        await gerarNovaSessaoQr();
 
     } catch (erro) {
 
@@ -467,6 +620,8 @@ btnUsarCelular.addEventListener('click', async () => {
             'Não foi possível gerar o QR Code.\n\n' +
             (erro.message || 'Erro desconhecido.')
         );
+
+        fecharModalQrCode();
     }
 });
 
