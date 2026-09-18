@@ -53,6 +53,7 @@ let fotosAtuais = [];
 
 let sessaoQrAtual = null;
 let intervaloVerificacaoQr = null;
+let urlsJaAdicionadasQr = new Set();
 
 
 // =====================================================
@@ -527,11 +528,11 @@ function fecharModalQrCode() {
 btnFecharQrCode.addEventListener('click', fecharModalQrCode);
 btnConcluirQrCode.addEventListener('click', fecharModalQrCode);
 
-async function gerarNovaSessaoQr() {
+async function iniciarSessaoQr() {
 
     const { data: sessao, error } = await supabaseClient
         .from('loja_upload_sessoes')
-        .insert({ status: 'aguardando' })
+        .insert({ status: 'aguardando', fotos: [] })
         .select('id')
         .single();
 
@@ -540,6 +541,7 @@ async function gerarNovaSessaoQr() {
     }
 
     sessaoQrAtual = sessao.id;
+    urlsJaAdicionadasQr = new Set();
 
     const linkUpload =
         `${window.location.origin}/loja-upload-foto.html?sessao=${sessao.id}`;
@@ -553,6 +555,8 @@ async function gerarNovaSessaoQr() {
 
     pararVerificacaoQr();
 
+    // Fica escutando a MESMA sessão o tempo todo — o celular pode
+    // mandar várias fotos seguidas sem precisar escanear de novo.
     intervaloVerificacaoQr = setInterval(async () => {
 
         if (!sessaoQrAtual) {
@@ -562,7 +566,7 @@ async function gerarNovaSessaoQr() {
         const { data: sessaoAtual, error: erroChecagem } =
             await supabaseClient
                 .from('loja_upload_sessoes')
-                .select('status, foto_url')
+                .select('fotos')
                 .eq('id', sessaoQrAtual)
                 .single();
 
@@ -570,31 +574,46 @@ async function gerarNovaSessaoQr() {
             return;
         }
 
-        if (sessaoAtual.status === 'concluido' && sessaoAtual.foto_url) {
+        const fotosRecebidas = Array.isArray(sessaoAtual.fotos)
+            ? sessaoAtual.fotos
+            : [];
 
-            pararVerificacaoQr();
+        const novas = fotosRecebidas.filter(
+            url => !urlsJaAdicionadasQr.has(url)
+        );
+
+        if (novas.length === 0) {
+            return;
+        }
+
+        novas.forEach((url) => {
+
+            if (fotosAtuais.length >= MAX_FOTOS) {
+                return;
+            }
+
+            urlsJaAdicionadasQr.add(url);
 
             fotosAtuais.push({
                 tipo: 'existente',
-                url: sessaoAtual.foto_url
+                url
             });
+        });
 
-            renderizarFotos();
+        renderizarFotos();
 
-            if (fotosAtuais.length >= MAX_FOTOS) {
+        if (fotosAtuais.length >= MAX_FOTOS) {
 
-                statusQrCode.textContent = `✅ Limite de ${MAX_FOTOS} fotos atingido!`;
-                statusQrCode.style.color = '#15803d';
+            statusQrCode.textContent = `✅ Limite de ${MAX_FOTOS} fotos atingido!`;
+            statusQrCode.style.color = '#15803d';
 
-                setTimeout(fecharModalQrCode, 1500);
+            setTimeout(fecharModalQrCode, 1500);
 
-            } else {
+        } else {
 
-                statusQrCode.textContent = '✅ Foto recebida! Pode enviar outra ou concluir.';
-                statusQrCode.style.color = '#15803d';
-
-                await gerarNovaSessaoQr();
-            }
+            statusQrCode.textContent =
+                `✅ ${fotosAtuais.length} foto(s) recebida(s). Pode enviar mais ou concluir.`;
+            statusQrCode.style.color = '#15803d';
         }
 
     }, 2500);
@@ -610,7 +629,7 @@ btnUsarCelular.addEventListener('click', async () => {
     try {
 
         modalQrCode.style.display = 'flex';
-        await gerarNovaSessaoQr();
+        await iniciarSessaoQr();
 
     } catch (erro) {
 
